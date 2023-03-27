@@ -1,0 +1,16 @@
+# Tooling
+**/.aws-sam/
+**/.gradle/
+
+# IDEs and build
+**/bin/
+**/target/
+**/.classpath
+**/.project
+**/.settings/
+**/.factorypath
+*.iml
+**/lib/
+**/.idea/
+/.apt_generated/
+/.apt_generated_tests/
