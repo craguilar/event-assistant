@@ -1,4 +1,4 @@
-package com.cmymesh.service;
+package com.cmymesh.event.assistant;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

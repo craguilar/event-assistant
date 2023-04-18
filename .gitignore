@@ -14,3 +14,8 @@
 **/.idea/
 /.apt_generated/
 /.apt_generated_tests/
+
+# App logic
+bdb.data/**
+*.local
+src/main/java/com/cmymesh/event/plugins/
