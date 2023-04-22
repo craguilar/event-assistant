@@ -18,6 +18,6 @@
 # App logic
 bdb.data/**
 dump.xml
-# App specific logic 
+# App specific logic
 *.local
 src/main/java/com/cmymesh/event/plugins/

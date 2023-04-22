@@ -5,6 +5,7 @@ import com.sleepycat.persist.model.PrimaryKey;
 import com.sleepycat.persist.model.SecondaryKey;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.List;
 
@@ -33,9 +34,10 @@ public class GuestTracking {
     } // For deserialization
 
     public boolean containsSuccessNotification(String templateName) {
+        LevenshteinDistance distance = new LevenshteinDistance();
         return notificationsSent.stream()
                 .filter(m -> !m.isFailedMessage())
-                .anyMatch(n -> n.getTemplateName().equalsIgnoreCase(templateName));
+                .anyMatch(n -> distance.apply(n.getTemplateName(),templateName) <= 5);
     }
 
     public boolean containsErrorNotification() {
