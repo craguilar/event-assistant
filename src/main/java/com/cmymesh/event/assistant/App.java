@@ -18,13 +18,11 @@ public class App {
 
         // TODO: Parameter parsing
         var eventId = "";
-        var guestStorageMode = GuestStorageMode.LOCAL;
-        var runningMode = AppRunningMode.SEND_NOTIFICATIONS;
+        var guestStorageMode = GuestStorageMode.DYNAMODB;
+        var runningMode = AppRunningMode.DUMP_TRACKING;
         var dataStorePath = new File("./bdb.data");
 
-
         run(eventId, dataStorePath, guestStorageMode, runningMode);
-
     }
 
     private static void run(String eventId, File dataStorePath, GuestStorageMode guestStorageMode, AppRunningMode runningMode) {
@@ -35,14 +33,16 @@ public class App {
             var guestService = GuestRepositoryFactory.guestService(guestStorageMode);
 
             // Execute
-            for (NotificationTemplate template : templateService.listTemplates(eventId)) {
-                switch (runningMode) {
-                    case VALIDATE -> GuestValidations.validate(guestService.listGuests(eventId));
-                    case TRACKING_FAILED_REPORT -> GuestValidations.failedTracking(eventAssistant);
-                    case SEND_NOTIFICATIONS ->
-                            notificationService.sendNotifications(guestService.listGuests(eventId), template);
-                    default -> throw new RuntimeException("Invalid runningMode");
+            switch (runningMode) {
+                case VALIDATE -> GuestValidations.validate(guestService.listGuests(eventId));
+                case TRACKING_FAILED_REPORT -> GuestValidations.failedTracking(eventAssistant);
+                case SEND_NOTIFICATIONS -> {
+                    for (NotificationTemplate template : templateService.listTemplates(eventId)) {
+                        notificationService.sendNotifications(guestService.listGuests(eventId), template);
+                    }
                 }
+                case DUMP_TRACKING -> eventAssistant.dump();
+                default -> throw new RuntimeException("Invalid runningMode");
             }
         }
     }

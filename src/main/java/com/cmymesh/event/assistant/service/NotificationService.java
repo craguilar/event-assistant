@@ -1,5 +1,6 @@
 package com.cmymesh.event.assistant.service;
 
+import com.cmymesh.event.assistant.ApplicationConstants;
 import com.cmymesh.event.assistant.model.Guest;
 import com.cmymesh.event.assistant.model.GuestTracking;
 import com.cmymesh.event.assistant.model.MessageResponse;
@@ -33,7 +34,7 @@ public class NotificationService {
         for (Guest guest : guests) {
             var guestTracking = eventAssistantService.get(guest.id());
             if (guest.isTentative() || guestTracking != null && guestTracking.containsSuccessNotification(template.templateName())) {
-                LOG.trace("Notification {}: Already sent to {} or isTentative or is USA or is Dr", template.templateName(), guestTracking);
+                LOG.trace("Notification {}: Already sent to {} or isTentative", template.templateName(), guestTracking);
                 continue;
             }
             var toPhone = guest.phoneNumber();
@@ -47,7 +48,7 @@ public class NotificationService {
                 if (isFreeForm) {
                     response = messaging.sendFreeFormMessage(toPhone, template, processedBody);
                 } else {
-                    var components = processTemplate(guest,template);
+                    var components = processTemplate(guest, template);
                     response = messaging.sendTemplateMessage(toPhone, template, components);
                 }
                 notificationsSent = !response.isFailedMessage() ? notificationsSent + 1 : 0;
@@ -67,11 +68,20 @@ public class NotificationService {
         LOG.info("Notifications sent {}", notificationsSent);
     }
 
+    /**
+     * Decided to implement a "dynamic" template processing engine where application users can define their own template
+     * processors by adding classes to "com.cmymesh.event.assistant.service" package that implements from {@link ComponentTemplate}
+     * and loading the classes during runtime here.
+     *
+     * @param guest the current processing guest.
+     * @param template the current processing template.
+     * @return a list of NotificationTemplateComponent used by the Notification engine.
+     */
     private List<NotificationTemplateComponent> processTemplate(Guest guest, NotificationTemplate template) {
 
         try {
             ComponentTemplate componentTemplate = (ComponentTemplate) this.getClass().getClassLoader()
-                    .loadClass("com.cmymesh.event.plugins.%s".formatted(template.ComponentProcessingClass()))
+                    .loadClass(ApplicationConstants.PLUGINS_BASE_PACKAGE + ".%s".formatted(template.ComponentProcessingClass()))
                     .getDeclaredConstructor()
                     .newInstance();
             return componentTemplate.processTemplate(guest);
