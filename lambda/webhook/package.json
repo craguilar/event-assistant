@@ -1,0 +1,21 @@
+{
+  "name": "demo-cars-lambda-authorizer",
+  "version": "1.0.0",
+  "description": "AWS Lambda Authorizer v1",
+  "main": "authorizer.js",
+  "dependencies": {
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craguilar/event-assistant.git"
+  },
+  "author": "Carlos Ruiz",
+  "bugs": {
+    "url": "https://github.com/craguilar/event-assistant/issues"
+  },
+  "homepage": "https://github.com/craguilar/event-assistant#readme"
+}
