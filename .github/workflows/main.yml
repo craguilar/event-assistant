@@ -38,5 +38,6 @@ jobs:
           cd lambda/webhook && npm ci
       - name: Package and Deploy
         run: |
-          zip -qr lambda.zip ./lambda/webhook/*
+          cd ./lambda/webhook/
+          zip -qr lambda.zip ./*
           aws lambda update-function-code --function-name=EventAssistantWhatsAppWebhook --zip-file=fileb://lambda.zip 
