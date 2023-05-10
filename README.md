@@ -34,7 +34,7 @@ Run the app
 java -jar target/event-assistant-1.0-SNAPSHOT.jar
 ```
 
-### WhatsApp Webhook
+### WhatsApp send message integration
 
 This app integrates with WhatsApp API to send notifications, the high level mental model for notification sending is :
 
@@ -44,6 +44,13 @@ This app integrates with WhatsApp API to send notifications, the high level ment
 - A _Receiver_ is a phone number who will receive the instance of a Template .
 
 API Reference https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
+
+
+### WhatsApp webhook
+
+WhatsApp integration allows you to set up a WebHook to process any reply made to your _Sender_ . For this you need to define
+a WebHook endpoint , this is the purpose of  _lambda_ package , which thanks to GitHub actions will deploy the code in _index.mjs_
+in an EventAssistantWhatsAppWebhook lambda in AWS.
 
 ### Berkeley DB Java Edition (JE)
 
