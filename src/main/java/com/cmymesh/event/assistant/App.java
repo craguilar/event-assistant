@@ -8,6 +8,7 @@ import com.cmymesh.event.assistant.repository.TemplateRepository;
 import com.cmymesh.event.assistant.service.NotificationService;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Event Assistant app! Yet another way of reinventing the wheel for sending Event notifications.
@@ -17,11 +18,12 @@ public class App {
     public static void main(String[] args) {
 
         // TODO: Parameter parsing
-        var eventId = "";
+        String eventId = null;
         var guestStorageMode = GuestStorageMode.DYNAMODB;
         var runningMode = AppRunningMode.DUMP_TRACKING;
         var dataStorePath = new File("./bdb.data");
 
+        Objects.requireNonNull(eventId, "Event Id must be not null");
         run(eventId, dataStorePath, guestStorageMode, runningMode);
     }
 
