@@ -49,7 +49,7 @@ public class MessagingServiceWhatsAppImpl implements MessagingService {
             var authToken = System.getenv("WHATSAPP_TOKEN");
             requireNonNull(authToken);
             var request = HttpRequest.newBuilder()
-                    .uri(new URI("https://graph.facebook.com/v13.0/%s/messages".formatted(fromPhoneNumber)))
+                    .uri(new URI("https://graph.facebook.com/v16.0/%s/messages".formatted(fromPhoneNumber)))
                     .header("Authorization", "Bearer %s".formatted(authToken))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(bodyRequest)))

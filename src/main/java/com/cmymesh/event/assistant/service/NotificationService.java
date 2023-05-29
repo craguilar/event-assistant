@@ -4,6 +4,8 @@ import com.cmymesh.event.assistant.ApplicationConstants;
 import com.cmymesh.event.assistant.MessagingMode;
 import com.cmymesh.event.assistant.model.Guest;
 import com.cmymesh.event.assistant.model.GuestTracking;
+import com.cmymesh.event.assistant.model.GuestValidResponse;
+import com.cmymesh.event.assistant.model.GuestValidations;
 import com.cmymesh.event.assistant.model.MessageResponse;
 import com.cmymesh.event.assistant.model.NotificationTemplate;
 import com.cmymesh.event.assistant.model.NotificationTemplateComponent;
@@ -38,18 +40,18 @@ public class NotificationService {
                 LOG.trace("Notification {}: Already sent to {} or isTentative", template.templateName(), guestTracking);
                 continue;
             }
-            var toPhone = guest.phoneNumber();
             var guestName = "%s %s".formatted(guest.firstName(), guest.lastName());
             // Handle add or Update logic
             if (guestTracking == null) {
                 guestTracking = new GuestTracking(guest.id(), guestName, new ArrayList<>());
             }
             MessageResponse response = null;
+
             try {
                 response = send(guest, template);
                 notificationsSent = !response.isFailedMessage() ? notificationsSent + 1 : 0;
             } catch (Exception e) {
-                LOG.error("When processing {}", toPhone, e);
+                LOG.error("When processing {}", guest);
             } finally {
                 if (response != null && !template.type().equals(MessagingMode.DRYRUN)) {
                     guestTracking.addOrUpdateNotification(response);
@@ -62,6 +64,11 @@ public class NotificationService {
     }
 
     private MessageResponse send(Guest guest, NotificationTemplate template) throws InterruptedException {
+        GuestValidResponse guestValidation = guest.isValid(GuestValidations.VALIDATE_PHONE);
+        if (!guestValidation.isValid()) {
+            return new MessageResponse(template.templateName(), guestValidation.message(), "failed", "whatsapp", null);
+        }
+
         var messaging = messagingFactory.getService(template.type());
         var processedBody = template.freeFormBody();
         var isFreeForm = StringUtils.isNotBlank(processedBody);
@@ -72,6 +79,7 @@ public class NotificationService {
         var components = processTemplate(guest, template);
         return messaging.sendTemplateMessage(toPhone, template, components);
     }
+
 
     /**
      * Decided to implement a "dynamic" template processing engine where application users can define their own template

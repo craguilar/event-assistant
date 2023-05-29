@@ -15,6 +15,21 @@ public class GuestValidations {
     private static final Logger LOG = LoggerFactory.getLogger(GuestValidations.class);
     private static final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
+    public static final Function<Guest, GuestValidResponse> VALIDATE_PHONE  = (Guest g) -> {
+        Phonenumber.PhoneNumber phone ;
+        try {
+            phone = phoneNumberUtil.parse(
+                    g.phoneNumber(),
+                    Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
+        } catch (NumberParseException e) {
+            return new GuestValidResponse(false, "Invalid format phone number %s".formatted(e.getMessage()));
+        }
+        if (!phoneNumberUtil.isValidNumber(phone)) {
+            return new GuestValidResponse(false, "Invalid phone number");
+        }
+        return new GuestValidResponse(true, "");
+    };
+
     private GuestValidations() {
 
     }
@@ -22,21 +37,8 @@ public class GuestValidations {
     public static void validate(List<Guest> guests) {
         int hasError = 0;
         for (Guest guest : guests) {
-            Function<Guest, GuestValidResponse> isValidFunction = (Guest g) -> {
-                Phonenumber.PhoneNumber phone ;
-                try {
-                    phone = phoneNumberUtil.parse(
-                            g.phoneNumber(),
-                            Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name());
-                } catch (NumberParseException e) {
-                    return new GuestValidResponse(false, "Invalid format phone number %s".formatted(e.getMessage()));
-                }
-                if (!phoneNumberUtil.isValidNumber(phone)) {
-                    return new GuestValidResponse(false, "Invalid phone number");
-                }
-                return new GuestValidResponse(true, "");
-            };
-            GuestValidResponse response = guest.isValid(isValidFunction);
+
+            GuestValidResponse response = guest.isValid(VALIDATE_PHONE);
             if (!response.isValid()) {
                 LOG.info("{} {} - {}", guest.firstName(), guest.lastName(), response.message());
                 hasError++;
