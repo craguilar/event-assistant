@@ -63,7 +63,7 @@ export const handler = async (event) => {
     } else if (method === "POST" && event.body) {
         const body = JSON.parse(event.body);
         const bodyEntry = body.entry;
-        console.log(bodyEntry);
+        console.log("General tree:"+JSON.stringify(bodyEntry, null, 2));
         if (bodyEntry &&
             bodyEntry[0].changes &&
             bodyEntry[0].changes[0] &&
