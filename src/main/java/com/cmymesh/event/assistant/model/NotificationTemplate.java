@@ -7,7 +7,7 @@ public record NotificationTemplate(String templateName,
                                    String fromPhoneNumber,
                                    MessagingMode type,
                                    String languageCode,
-                                   String freeFormbody,
+                                   String freeFormBody,
                                    String ComponentProcessingClass) {
 }
 

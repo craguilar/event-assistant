@@ -3,6 +3,7 @@ package com.cmymesh.event.assistant.repository;
 import com.cmymesh.event.assistant.ApplicationConstants;
 import com.cmymesh.event.assistant.model.GuestTracking;
 import com.cmymesh.event.assistant.model.MessageResponse;
+import com.cmymesh.event.assistant.model.MessageStatus;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
@@ -11,11 +12,14 @@ import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.IndexNotAvailableException;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
+import com.sleepycat.persist.evolve.Conversion;
+import com.sleepycat.persist.evolve.Converter;
 import com.sleepycat.persist.evolve.Mutations;
 import com.sleepycat.persist.evolve.Renamer;
 import com.sleepycat.persist.model.EntityModel;
 import com.sleepycat.persist.raw.RawObject;
 import com.sleepycat.persist.raw.RawStore;
+import com.sleepycat.persist.raw.RawType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +62,7 @@ public class EventAssistantRepository implements Closeable {
                 MessageResponse.class.getName()));
         mutations.addRenamer(new Renamer(ApplicationConstants.OLD_BASE_PACKAGE + ".model.GuestTracking", 0,
                 GuestTracking.class.getName()));
+        mutations.addConverter(new Converter(MessageResponse.class.getName(), 2, "status", new MessageResponseStatusConversion()));
 
         /* Open a transactional entity store. */
         StoreConfig storeConfig = new StoreConfig();
@@ -151,6 +156,24 @@ public class EventAssistantRepository implements Closeable {
 
             personById = store.getPrimaryIndex(String.class, GuestTracking.class);
 
+        }
+    }
+
+    private static class MessageResponseStatusConversion implements Conversion {
+
+        @Override
+        public void initialize(EntityModel model) {
+            // Not doing anything
+        }
+
+        @Override
+        public Object convert(Object o) {
+            return o;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof MessageResponseStatusConversion;
         }
     }
 }

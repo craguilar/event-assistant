@@ -6,24 +6,24 @@ import com.cmymesh.event.assistant.repository.EventAssistantRepository;
 import com.cmymesh.event.assistant.repository.GuestRepositoryFactory;
 import com.cmymesh.event.assistant.repository.TemplateRepository;
 import com.cmymesh.event.assistant.service.NotificationService;
+import org.apache.commons.cli.ParseException;
 
 import java.io.File;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Event Assistant app! Yet another way of reinventing the wheel for sending Event notifications.
  */
 public class App {
 
-    public static void main(String[] args) {
-
-        // TODO: Parameter parsing
-        String eventId = null;
-        var guestStorageMode = GuestStorageMode.DYNAMODB;
-        var runningMode = AppRunningMode.DUMP_TRACKING;
+    public static void main(String[] args) throws ParseException {
+        var cmd = CmdOptions.parseCmdOptions(args);
+        var eventId = cmd.getOptionValue(CmdOptions.EVENT_ID_OPTION);
+        var guestStorageMode = GuestStorageMode.valueOf(cmd.getOptionValue(CmdOptions.STORAGE_MODE_OPTION,GuestStorageMode.DYNAMODB.toString()));
+        var runningMode = AppRunningMode.valueOf(cmd.getOptionValue(CmdOptions.APP_RUNNING_MODE_OPTION,AppRunningMode.VALIDATE.toString()));
         var dataStorePath = new File("./bdb.data");
-
-        Objects.requireNonNull(eventId, "Event Id must be not null");
+        requireNonNull(eventId, "Event Id must be not null");
         run(eventId, dataStorePath, guestStorageMode, runningMode);
     }
 

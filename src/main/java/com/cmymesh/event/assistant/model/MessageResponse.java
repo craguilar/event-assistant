@@ -7,7 +7,7 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.Set;
 
-@Persistent(version = 1)
+@Persistent(version = 3)
 @Getter
 @ToString
 public class MessageResponse implements Serializable {

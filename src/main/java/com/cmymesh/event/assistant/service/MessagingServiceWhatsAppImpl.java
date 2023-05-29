@@ -1,6 +1,7 @@
 package com.cmymesh.event.assistant.service;
 
 import com.cmymesh.event.assistant.model.MessageResponse;
+import com.cmymesh.event.assistant.model.MessageStatus;
 import com.cmymesh.event.assistant.model.NotificationTemplate;
 import com.cmymesh.event.assistant.model.NotificationTemplateComponent;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -17,18 +18,24 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
 
 
 public class MessagingServiceWhatsAppImpl implements MessagingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagingServiceWhatsAppImpl.class);
+    private static final int RETRY_TIMES = 5;
+    private static final int TIMEOUT_SECONDS = 3;
+    private static final Set<Integer> RETRYABLE_STATUS_CODE = Set.of(500, 429);
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     public MessagingServiceWhatsAppImpl() {
-        Objects.requireNonNull(System.getenv("WHATSAPP_TOKEN"), "When sending notifications WHATSAPP_TOKEN needs to be set" );
+        requireNonNull(System.getenv("WHATSAPP_TOKEN"), "When sending notifications WHATSAPP_TOKEN needs to be set");
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -40,16 +47,16 @@ public class MessagingServiceWhatsAppImpl implements MessagingService {
         try {
             var bodyRequest = getMetaRequest(template, toPhoneNumber, components);
             var authToken = System.getenv("WHATSAPP_TOKEN");
-            Objects.requireNonNull(authToken);
-            // TODO: Add retries and connection timeout
+            requireNonNull(authToken);
             var request = HttpRequest.newBuilder()
                     .uri(new URI("https://graph.facebook.com/v13.0/%s/messages".formatted(fromPhoneNumber)))
                     .header("Authorization", "Bearer %s".formatted(authToken))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(bodyRequest)))
+                    .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
                     .build();
-            HttpClient http = HttpClient.newHttpClient();
-            var httpResponse = http.send(request, HttpResponse.BodyHandlers.ofString());
+            var httpResponse = sendWithRetries(request);
+            requireNonNull(httpResponse, "httpResponse is Null");
             var stringResponse = httpResponse.body();
             var metaMessageResponse = mapper.readValue(stringResponse, MetaMessageResponse.class);
             if (httpResponse.statusCode() / 100 == 2) {
@@ -58,11 +65,26 @@ public class MessagingServiceWhatsAppImpl implements MessagingService {
                 response = new MessageResponse(template.templateName(), metaMessageResponse.error.message, "failed", "whatsapp", metaMessageResponse.error.fbtrace_id);
                 LOG.debug("Response sent {} / {} / {}", bodyRequest, httpResponse, stringResponse);
             }
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException | URISyntaxException e) {
             LOG.error("", e);
             response = new MessageResponse(template.templateName(), e.getMessage(), "failed", "whatsapp", null);
         }
         return response;
+    }
+
+    private HttpResponse<String> sendWithRetries(HttpRequest request) throws IOException, InterruptedException {
+        HttpClient http = HttpClient.newHttpClient();
+        HttpResponse<String> httpResponse = null;
+        for (int i = 0; i < RETRY_TIMES; i++) {
+            httpResponse = http.send(request, HttpResponse.BodyHandlers.ofString());
+            int statusCode = httpResponse.statusCode();
+            if (!RETRYABLE_STATUS_CODE.contains(statusCode)) {
+                break;
+            }
+            LOG.warn("Call to Meta API failed with code {} , tried {} times", statusCode, i);
+            Thread.sleep(500);
+        }
+        return httpResponse;
     }
 
 
