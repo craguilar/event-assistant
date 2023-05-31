@@ -1,14 +1,14 @@
 /* eslint-disable max-len */
-import { createRequire } from 'module';
+import {createRequire} from 'module';
 
 const require = createRequire(import.meta.url);
 const https = require('https');
 const aws = require('aws-sdk');
 const TABLE_NAME = 'messages';
 
-aws.config.update({ region: process.env.AWS_REGION });
+aws.config.update({region: process.env.AWS_REGION});
 // eslint-disable-next-line no-unused-vars
-const ddb = new aws.DynamoDB({ apiVersion: '2012-08-10' });
+const ddb = new aws.DynamoDB({apiVersion: '2012-08-10'});
 
 const doPostRequest = (host, path, data) => {
   return new Promise((resolve, reject) => {
@@ -102,7 +102,7 @@ export const handler = async (event) => {
     const changes = bodyEntry[0].changes;
     // Not of our interest simply return ok
     if (!bodyEntry || !changes || !changes[0] || !changes[0].value) {
-      return { statusCode: 200 };
+      return {statusCode: 200};
     }
     const value = changes[0].value;
     console.log('General tree:' + JSON.stringify(value, null, 2));
@@ -125,15 +125,15 @@ export const handler = async (event) => {
         await doPostRequest('graph.facebook.com', path, {
           messaging_product: 'whatsapp',
           to: from,
-          text: { body: 'Este es un mensaje automatizado, gracias por tu respuesta!' },
+          text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
         }).then((result) => {
           console.log(`Status code: ${result}`);
           const params = {
             TableName: TABLE_NAME,
             Item: {
-              'id': { S: phoneNumberId },
-              'type': { S: 'RECIPIENT-' + from },
-              'document': { S: msgBody },
+              'id': {S: phoneNumberId},
+              'type': {S: 'RECIPIENT-' + from},
+              'document': {S: msgBody},
             },
           };
           putItems(params);
@@ -145,9 +145,9 @@ export const handler = async (event) => {
       value.statuses[0].status === 'failed') {
       processErrors(phoneNumberId, value.statuses[0]);
     }
-    return { statusCode: 200 };
+    return {statusCode: 200};
   } else {
     // Return a '404 Not Found' if event is not from a WhatsApp API
-    return { statusCode: 404 };
+    return {statusCode: 404};
   }
 };
