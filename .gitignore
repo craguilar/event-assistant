@@ -15,7 +15,7 @@
 /.apt_generated/
 /.apt_generated_tests/
 dependency-reduced-pom.xml
-
+**/node_modules/*
 # App logic
 bdb.data/**
 dump.xml

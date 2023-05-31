@@ -1,13 +1,16 @@
 {
-  "name": "demo-cars-lambda-authorizer",
+  "name": "event-assistant-webhook",
   "version": "1.0.0",
-  "description": "AWS Lambda Authorizer v1",
-  "main": "authorizer.js",
-  "dependencies": {
+  "description": "event-assistant-webhook",
+  "main": "index.mjs",
+  "devDependencies": {
+    "eslint": "^8.41.0",
+    "eslint-config-google": "^0.14.0"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .  --ext .mjs",
+    "lint-fix": "eslint --fix .  --ext .mjs"
   },
   "repository": {
     "type": "git",

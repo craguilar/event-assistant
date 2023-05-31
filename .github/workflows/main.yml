@@ -33,13 +33,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2 
+      - name: Install application
+        run: npm install
       # Runs a single command using the runners shell
       - name: Build
         env:
           CI: true
         run: |
-          cd lambda/webhook && npm ci && sam build
+          cd lambda/webhook && npm ci && npm lint
       - name: Package and Deploy
         run: |
           cd ./lambda/webhook/ 
+          sam build
           sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --on-failure ROLLBACK
