@@ -34,7 +34,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2 
       - name: Install application
-        run: npm install
+        run: cd lambda/webhook && npm install
       # Runs a single command using the runners shell
       - name: Build
         env:
