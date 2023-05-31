@@ -21,6 +21,10 @@ Resources:
             VERIFY_TOKEN: "OVERRIDE"
             WHATSAPP_TOKEN: "OVERRIDE"
       Timeout: 3
+      Role:
+        Fn::GetAtt:
+        - LambdaExecutionRole
+        - Arn
       CodeUri: .
       Architectures: 
         - "arm64"
@@ -57,3 +61,34 @@ Resources:
         - 
           AttributeName: "type"
           KeyType: RANGE
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'EventAssistant-WhatsAppWebhook-Execution'
+      Description: Creating service role in IAM for AWS Lambda
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      Policies: 
+        - PolicyName: LambdaDynamoExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:ConditionCheckItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                Resource: '*'

@@ -45,4 +45,4 @@ jobs:
         run: |
           cd ./lambda/webhook/ 
           sam build
-          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --on-failure ROLLBACK
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --on-failure ROLLBACK --capabilities CAPABILITY_NAMED_IAM
