@@ -51,7 +51,8 @@ const processMessages = async (phoneNumberId, messages) => {
     const from = messages[0].from; // extract the phone number
     const msgBody = messages[0].text.body; // extract the message text
 
-    console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
+    // eslint-disable-next-line max-len
+    console.log('Reply from:' + from + ' to ' +phoneNumberId+ ':' + JSON.stringify(msgBody, null, 2)+' ');
     const token = process.env.WHATSAPP_TOKEN;
     const path = '/v12.0/' +
       phoneNumberId +
@@ -78,7 +79,7 @@ const processMessages = async (phoneNumberId, messages) => {
       });
     }).catch((err) =>
     // eslint-disable-next-line max-len
-      console.error(`Error for the event: ${JSON.stringify(event)} => ${err}`));
+      console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
   }
 };
 
