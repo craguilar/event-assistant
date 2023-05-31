@@ -74,26 +74,7 @@ const processMessages = async (phoneNumberId, messages) => {
   }
 };
 
-
-/**
- *
- * @param {*} phoneNumberId represents the send associated to this flow.
- * @param {*} status represents a single failed status
- */
-const processErrors = (phoneNumberId, status) => {
-  console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
-  const params = {
-    TableName: TABLE_NAME,
-    Item: {
-      'id': {S: phoneNumberId},
-      'type': {S: 'RECIPIENT-' + status.recipient_id},
-      'document': {S: status},
-    },
-  };
-  putItems(params);
-};
-
-export const handler = (event) => {
+export const handler = async (event) => {
   console.log(event);
   const method = event.requestContext.httpMethod;
   const path = event.path;
@@ -104,10 +85,12 @@ export const handler = (event) => {
   }
 
   if (method === 'GET') {
+    console.log('Subscribing');
     const mode = event.queryStringParameters['hub.mode'];
     const token = event.queryStringParameters['hub.verify_token'];
     const challenge = event.queryStringParameters['hub.challenge'];
     const verifyToken = process.env.VERIFY_TOKEN;
+    console.log('Ready to go...');
     if (mode === 'subscribe' && token === verifyToken) {
       // Respond with 200 OK and challenge token from the request
       return {
