@@ -4,7 +4,7 @@ import {createRequire} from 'module';
 const require = createRequire(import.meta.url);
 const https = require('https');
 const aws = require('aws-sdk');
-// const TABLE_NAME = 'messages';
+const TABLE_NAME = 'messages';
 
 aws.config.update({region: process.env.AWS_REGION});
 // eslint-disable-next-line no-unused-vars
@@ -113,7 +113,7 @@ export const handler = async (event) => {
         const from = value.messages[0].from; // extract the phone number
         const msgBody = value.messages[0].text.body; // extract the message text
 
-        console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
+        console.log('Reply from:' + from + ': ' + JSON.stringify(msgBody, null, 2));
         const token = process.env.WHATSAPP_TOKEN;
         const path = '/v16.0/' +
           phoneNumberId +
