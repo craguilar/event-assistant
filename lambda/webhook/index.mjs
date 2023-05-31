@@ -2,6 +2,12 @@ import {createRequire} from 'module';
 
 const require = createRequire(import.meta.url);
 const https = require('https');
+const aws = require('aws-sdk');
+const TABLE_NAME = 'messages';
+
+aws.config.update({region: process.env.AWS_REGION});
+// eslint-disable-next-line no-unused-vars
+const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 const doPostRequest = (host, path, data) => {
   return new Promise((resolve, reject) => {
@@ -70,6 +76,19 @@ const processMessages = async (phoneNumberId, messages) => {
 const processErrors = async (phoneNumberId, status) => {
   // eslint-disable-next-line max-len
   console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
+  const params = {
+    TableName: TABLE_NAME,
+    Item: {
+      'id': {S: phoneNumberId},
+      'type': {S: 'RECIPIENT-' + status.recipient_id},
+      'document': {S: status},
+    },
+  };
+  ddb.putItem(params, function(err, data) {
+    if (err) {
+      console.log('Error Putting item', err);
+    }
+  });
 };
 
 export const handler = async (event) => {

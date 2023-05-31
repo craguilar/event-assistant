@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/craguilar/event-assistant/issues"
   },
-  "homepage": "https://github.com/craguilar/event-assistant#readme"
+  "homepage": "https://github.com/craguilar/event-assistant#readme",
+  "dependencies": {
+    "aws-sdk": "^2.1387.0"
+  }
 }
