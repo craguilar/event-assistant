@@ -39,6 +39,10 @@ const doPostRequest = (host, path, data) => {
   });
 };
 
+const putItems = (params) => {
+  return ddb.putItem(params);
+};
+
 /**
  * See parsing of Components in https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/components
  * @param {*} phoneNumberId represents the send associated to this flow.
