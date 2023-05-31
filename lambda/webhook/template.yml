@@ -16,10 +16,15 @@ Resources:
       Description: "Event Assistant webhook"
       Handler: "index.handler"
       Runtime: nodejs18.x
+      Environment: 
+        Variables: 
+            VERIFY_TOKEN: "OVERRIDE"
+            WHATSAPP_TOKEN: "OVERRIDE"
       Timeout: 3
       CodeUri: .
       Architectures: 
         - "arm64"
+      AutoPublishAliasAllProperties: false
       AutoPublishAlias: live
       DeploymentPreference:
         Enabled: true
