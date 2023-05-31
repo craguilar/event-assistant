@@ -76,11 +76,9 @@ const processMessages = async (phoneNumberId, messages) => {
           console.log('Error Putting item', err);
         }
       });
-    })
-        .then
-        .catch((err) =>
-        // eslint-disable-next-line max-len
-          console.error(`Error for the event: ${JSON.stringify(event)} => ${err}`));
+    }).catch((err) =>
+    // eslint-disable-next-line max-len
+      console.error(`Error for the event: ${JSON.stringify(event)} => ${err}`));
   }
 };
 
