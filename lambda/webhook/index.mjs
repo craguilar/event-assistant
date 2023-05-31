@@ -40,37 +40,6 @@ const doPostRequest = (host, path, data) => {
 };
 
 
-/**
- * See parsing of Components in https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/components
- * @param {*} phoneNumberId represents the send associated to this flow.
- * @param {*} messages is an array of messages
- */
-const processMessages = async (phoneNumberId, messages) => {
-  if (messages &&
-    messages[0] &&
-    messages[0].text &&
-    messages[0].from) {
-    const from = messages[0].from; // extract the phone number
-    const msgBody = messages[0].text.body; // extract the message text
-
-    console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
-    const token = process.env.WHATSAPP_TOKEN;
-    const path = '/v16.0/' +
-      phoneNumberId +
-      '/messages?access_token=' +
-      token;
-    await doPostRequest('graph.facebook.com', path, {
-      messaging_product: 'whatsapp',
-      to: from,
-      text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
-    }).then((result) => {
-      console.log(`Status code: ${result}`);
-      // putItems(params);
-    }).catch((err) =>
-      console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
-  }
-};
-
 export const handler = async (event) => {
   console.log(event);
   const method = event.requestContext.httpMethod;
@@ -82,12 +51,10 @@ export const handler = async (event) => {
   }
 
   if (method === 'GET') {
-    console.log('Subscribing');
     const mode = event.queryStringParameters['hub.mode'];
     const token = event.queryStringParameters['hub.verify_token'];
     const challenge = event.queryStringParameters['hub.challenge'];
     const verifyToken = process.env.VERIFY_TOKEN;
-    console.log('Ready to go...');
     if (mode === 'subscribe' && token === verifyToken) {
       // Respond with 200 OK and challenge token from the request
       return {
@@ -114,6 +81,29 @@ export const handler = async (event) => {
     const phoneNumberId = value.metadata.phone_number_id;
     if (value.messages) {
       processMessages(phoneNumberId, value.messages);
+      if (value.messages &&
+        value.messages[0] &&
+        value.messages[0].text &&
+        value.messages[0].from) {
+        const from = messages[0].from; // extract the phone number
+        const msgBody = messages[0].text.body; // extract the message text
+
+        console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
+        const token = process.env.WHATSAPP_TOKEN;
+        const path = '/v16.0/' +
+          phoneNumberId +
+          '/messages?access_token=' +
+          token;
+        await doPostRequest('graph.facebook.com', path, {
+          messaging_product: 'whatsapp',
+          to: from,
+          text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
+        }).then((result) => {
+          console.log(`Status code: ${result}`);
+          // putItems(params);
+        }).catch((err) =>
+          console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
+      }
     } else if (value.statuses &&
       value.statuses[0] &&
       value.statuses[0].status === 'failed') {
