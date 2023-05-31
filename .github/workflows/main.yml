@@ -23,28 +23,23 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2 
         with:  
-          node-version: '16'
+          node-version: '18'
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
       - name: Configure AWS Credentials  
         uses: aws-actions/configure-aws-credentials@v1 #--> Setup the Credential for the AWS cli
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2 
-      # Create S3 bucket
-      - name: Provision bucket
-        env:
-          CI: true
-        run: |
-          EXISTS=`aws s3 ls | grep -zq billing && echo "yes" || echo "no"`
-          if ["$EXISTS" = "no" ]; then aws s3 mb s3://event-assistant-webhook-code; fi
       # Runs a single command using the runners shell
       - name: Build
         env:
           CI: true
         run: |
-          cd lambda/webhook && npm ci
+          cd lambda/webhook && npm ci && sam build
       - name: Package and Deploy
         run: |
-          cd ./lambda/webhook/
-          zip -qr lambda.zip ./*
-          aws lambda update-function-code --function-name=EventAssistantWhatsAppWebhook --zip-file=fileb://lambda.zip 
+          cd ./lambda/webhook/ 
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --on-failure DELETE

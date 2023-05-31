@@ -1,0 +1,8 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "event-assistant-webhook"
+resolve_s3 = true
+s3_prefix = "event-assistant-webhook-stack"
+region = "us-east-2"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

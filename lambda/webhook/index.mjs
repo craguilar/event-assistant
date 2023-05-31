@@ -1,4 +1,4 @@
-import {createRequire} from 'module';
+import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 const https = require('https');
@@ -34,9 +34,9 @@ const doPostRequest = (host, path, data) => {
 };
 
 export const handler = async (event) => {
-
-    const method = event.requestContext.http.method;
-    const path = event.requestContext.http.path;
+    console.log(JSON.parse(event))
+    const method = event.requestContext.httpMethod;
+    const path = event.path;
     if (path !== "/webhook") {
         return {
             statusCode: 403
@@ -63,7 +63,7 @@ export const handler = async (event) => {
     } else if (method === "POST" && event.body) {
         const body = JSON.parse(event.body);
         const bodyEntry = body.entry;
-        console.log("General tree:"+JSON.stringify(bodyEntry, null, 2));
+        console.log("General tree:" + JSON.stringify(bodyEntry, null, 2));
         if (bodyEntry &&
             bodyEntry[0].changes &&
             bodyEntry[0].changes[0] &&
@@ -85,15 +85,15 @@ export const handler = async (event) => {
             await doPostRequest("graph.facebook.com", path, {
                 messaging_product: "whatsapp",
                 to: from,
-                text: {body: "Este es un mensaje automatizado, gracias por tu respuesta!"},
+                text: { body: "Este es un mensaje automatizado, gracias por tu respuesta!" },
             })
                 .then(result => console.log(`Status code: ${result}`))
                 .catch(err => console.error(`Error doing the request for the event: ${JSON.stringify(event)} => ${err}`));
 
         }
-        return {statusCode: 200};
+        return { statusCode: 200 };
     } else {
         // Return a '404 Not Found' if event is not from a WhatsApp API
-        return {statusCode: 404};
+        return { statusCode: 404 };
     }
 };

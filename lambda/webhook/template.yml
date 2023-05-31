@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Api:
+    # API Gateway regional endpoints
+    EndpointConfiguration: REGIONAL
+  Function:
+    AutoPublishAlias: live
+    DeploymentPreference:
+      Enabled: true
+      Type: Canary10Percent5Minutes
+
+Resources:
+  WhatsAppWebHookLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "EventAssistant-WhatsAppWebhook"
+      Description: "Event Assistant webhook"
+      Handler: "index.handler"
+      Runtime: nodejs18.x
+      Timeout: 3
+      CodeUri: .
+      Architectures: 
+        - "arm64"
+      Environment: 
+        Variables: 
+            VERIFY_TOKEN: ""
+            WHATSAPP_TOKEN: ""
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            TimeoutInMillis: 10000
+            PayloadFormatVersion: '1.0'
+
+  WebHookTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: messages
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      AttributeDefinitions:
+        - 
+          AttributeName: "id"
+          AttributeType: "S"
+        - 
+          AttributeName: "type"
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: "id"
+          KeyType: HASH
+        - 
+          AttributeName: "type"
+          KeyType: RANGE
