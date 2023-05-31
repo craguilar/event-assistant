@@ -61,19 +61,36 @@ const processMessages = async (phoneNumberId, messages) => {
       messaging_product: 'whatsapp',
       to: from,
       text: {body: 'Este es un mensaje automatizado,gracias por tu respuesta!'},
-    }).then((result) => console.log(`Status code: ${result}`))
+    }).then((result) => {
+      console.log(`Status code: ${result}`);
+      const params = {
+        TableName: TABLE_NAME,
+        Item: {
+          'id': {S: phoneNumberId},
+          'type': {S: 'RECIPIENT-' + from},
+          'document': {S: msgBody},
+        },
+      };
+      ddb.putItem(params, function(err, data) {
+        if (err) {
+          console.log('Error Putting item', err);
+        }
+      });
+    })
+        .then
         .catch((err) =>
         // eslint-disable-next-line max-len
           console.error(`Error for the event: ${JSON.stringify(event)} => ${err}`));
   }
 };
 
+
 /**
  *
  * @param {*} phoneNumberId represents the send associated to this flow.
  * @param {*} status represents a single failed status
  */
-const processErrors = async (phoneNumberId, status) => {
+const processErrors = (phoneNumberId, status) => {
   // eslint-disable-next-line max-len
   console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
   const params = {
