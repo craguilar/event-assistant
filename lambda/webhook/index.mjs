@@ -39,6 +39,32 @@ const doPostRequest = (host, path, data) => {
   });
 };
 
+const putItems = (params) => {
+  try {
+    return ddb.putItem(params);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+/**
+   *
+   * @param {*} phoneNumberId represents the send associated to this flow.
+   * @param {*} status represents a single failed status
+   */
+const processErrors = (phoneNumberId, status) => {
+  console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
+  const params = {
+    TableName: TABLE_NAME,
+    Item: {
+      'id': {S: phoneNumberId},
+      'type': {S: 'RECIPIENT-' + status.recipient_id},
+      'document': {S: status},
+    },
+  };
+  putItems(params);
+};
+
 
 export const handler = async (event) => {
   console.log(event);
@@ -99,6 +125,15 @@ export const handler = async (event) => {
           text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
         }).then((result) => {
           console.log(`Status code: ${result}`);
+          const params = {
+            TableName: TABLE_NAME,
+            Item: {
+              'id': {S: phoneNumberId},
+              'type': {S: 'RECIPIENT-' + from},
+              'document': {S: msgBody},
+            },
+          };
+          putItems(params);
         }).catch((err) =>
           console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
       }
