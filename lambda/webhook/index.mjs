@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {createRequire} from 'module';
 
 const require = createRequire(import.meta.url);
@@ -38,6 +39,10 @@ const doPostRequest = (host, path, data) => {
   });
 };
 
+const putItems = (params) => {
+  return ddb.putItem(params);
+};
+
 /**
  *
  * @param {*} phoneNumberId represents the send associated to this flow.
@@ -53,18 +58,18 @@ const processMessages = async (phoneNumberId, messages) => {
 
     console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
     const token = process.env.WHATSAPP_TOKEN;
-    const path = '/v12.0/' +
+    const path = '/v16.0/' +
       phoneNumberId +
       '/messages?access_token=' +
       token;
     await doPostRequest('graph.facebook.com', path, {
       messaging_product: 'whatsapp',
       to: from,
-      text: {body: 'Este es un mensaje automatizado,gracias por tu respuesta!'},
+      text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
     }).then((result) => {
       console.log(`Status code: ${result}`);
+      // putItems(params);
     }).catch((err) =>
-    // eslint-disable-next-line max-len
       console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
   }
 };
@@ -76,7 +81,6 @@ const processMessages = async (phoneNumberId, messages) => {
  * @param {*} status represents a single failed status
  */
 const processErrors = (phoneNumberId, status) => {
-  // eslint-disable-next-line max-len
   console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
   const params = {
     TableName: TABLE_NAME,
@@ -86,11 +90,7 @@ const processErrors = (phoneNumberId, status) => {
       'document': {S: status},
     },
   };
-  ddb.putItem(params, function(err, data) {
-    if (err) {
-      console.log('Error Putting item', err);
-    }
-  });
+  putItems(params);
 };
 
 export const handler = (event) => {
