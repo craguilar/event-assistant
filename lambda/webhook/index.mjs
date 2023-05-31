@@ -78,8 +78,8 @@ export const handler = async (event) => {
       statusCode: 403,
     };
   }
-
   if (method === 'GET') {
+    console.log('Proceeding with WebHook Validation.');
     const mode = event.queryStringParameters['hub.mode'];
     const token = event.queryStringParameters['hub.verify_token'];
     const challenge = event.queryStringParameters['hub.challenge'];
@@ -97,6 +97,7 @@ export const handler = async (event) => {
       };
     }
   } else if (method === 'POST' && event.body) {
+    console.log('Proceeding with WebHook event processing.');
     const body = JSON.parse(event.body);
     const bodyEntry = body.entry;
     const changes = bodyEntry[0].changes;
