@@ -30,6 +30,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2 
+      # Create S3 bucket
+      - name: Provision bucket
+        env:
+          CI: true
+        run: |
+          EXISTS=`aws s3 ls | grep event-assistant-webhook-code`
+          if [ -z "$EXISTS" ]; then aws s3 mb s3://event-assistant-webhook-code; fi
       # Runs a single command using the runners shell
       - name: Build
         env:
