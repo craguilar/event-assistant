@@ -63,14 +63,16 @@ export const handler = async (event) => {
     } else if (method === "POST" && event.body) {
         const body = JSON.parse(event.body);
         const bodyEntry = body.entry;
+        const changes = bodyEntry[0].changes;
+        // Not of our interest simply return ok 
+        if (!bodyEntry || !changes || !changes[0]) {
+            return { statusCode: 200 };
+        }
         console.log("General tree:" + JSON.stringify(bodyEntry, null, 2));
-        if (bodyEntry &&
-            bodyEntry[0].changes &&
-            bodyEntry[0].changes[0] &&
-            bodyEntry[0].changes[0].value.messages &&
-            bodyEntry[0].changes[0].value.messages[0] &&
-            bodyEntry[0].changes[0].value.messages[0].text &&
-            bodyEntry[0].changes[0].value.messages[0].from) {
+        if (changes[0].value.messages &&
+            changes[0].value.messages[0] &&
+            changes[0].value.messages[0].text &&
+            changes[0].value.messages[0].from) {
 
             const phone_number_id = bodyEntry[0].changes[0].value.metadata.phone_number_id;
             const from = bodyEntry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
