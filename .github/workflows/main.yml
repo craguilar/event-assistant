@@ -21,14 +21,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2 
+      - uses: actions/setup-node@v3 
         with:  
           node-version: '18'
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
       - name: Configure AWS Credentials  
-        uses: aws-actions/configure-aws-credentials@v1 #--> Setup the Credential for the AWS cli
+        uses: aws-actions/configure-aws-credentials@v2 #--> Setup the Credential for the AWS cli
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
