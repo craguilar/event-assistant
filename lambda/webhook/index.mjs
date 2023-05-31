@@ -63,19 +63,23 @@ const processMessages = async (phoneNumberId, messages) => {
       text: {body: 'Este es un mensaje automatizado,gracias por tu respuesta!'},
     }).then((result) => {
       console.log(`Status code: ${result}`);
-      const params = {
-        TableName: TABLE_NAME,
-        Item: {
-          'id': {S: phoneNumberId},
-          'type': {S: 'RECIPIENT-' + from},
-          'document': {S: msgBody},
-        },
-      };
-      ddb.putItem(params, function(err, data) {
-        if (err) {
-          console.error('Error Putting item', err);
-        }
-      });
+      try {
+        const params = {
+          TableName: TABLE_NAME,
+          Item: {
+            'id': {S: phoneNumberId},
+            'type': {S: 'RECIPIENT-' + from},
+            'document': {S: msgBody},
+          },
+        };
+        ddb.putItem(params, function(err, data) {
+          if (err) {
+            console.error('Error Putting item', err);
+          }
+        });
+      } catch (e) {
+        console.error('Error Putting item', err);
+      }
     }).catch((err) =>
     // eslint-disable-next-line max-len
       console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
@@ -91,19 +95,23 @@ const processMessages = async (phoneNumberId, messages) => {
 const processErrors = (phoneNumberId, status) => {
   // eslint-disable-next-line max-len
   console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
-  const params = {
-    TableName: TABLE_NAME,
-    Item: {
-      'id': {S: phoneNumberId},
-      'type': {S: 'RECIPIENT-' + status.recipient_id},
-      'document': {S: status},
-    },
-  };
-  ddb.putItem(params, function(err, data) {
-    if (err) {
-      console.log('Error Putting item', err);
-    }
-  });
+  try {
+    const params = {
+      TableName: TABLE_NAME,
+      Item: {
+        'id': {S: phoneNumberId},
+        'type': {S: 'RECIPIENT-' + status.recipient_id},
+        'document': {S: status},
+      },
+    };
+    ddb.putItem(params, function(err, data) {
+      if (err) {
+        console.log('Error Putting item', err);
+      }
+    });
+  } catch (e) {
+    console.error('Error Putting item', err);
+  }
 };
 
 export const handler = (event) => {
