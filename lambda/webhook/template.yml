@@ -6,11 +6,7 @@ Globals:
   Api:
     # API Gateway regional endpoints
     EndpointConfiguration: REGIONAL
-  Function:
-    AutoPublishAlias: live
-    DeploymentPreference:
-      Enabled: true
-      Type: Canary10Percent5Minutes
+    
 
 Resources:
   WhatsAppWebHookLambda:
@@ -24,10 +20,10 @@ Resources:
       CodeUri: .
       Architectures: 
         - "arm64"
-      Environment: 
-        Variables: 
-            VERIFY_TOKEN: ""
-            WHATSAPP_TOKEN: ""
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Enabled: true
+        Type: Canary10Percent5Minutes
       Events:
         HttpApiEvent:
           Type: HttpApi
