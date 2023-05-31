@@ -75,7 +75,7 @@ Resources:
           Action: sts:AssumeRole
       Path: /
       Policies: 
-        - PolicyName: LambdaDynamoExecution
+        - PolicyName: LambdaCustomExecution
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -91,4 +91,7 @@ Resources:
                   - 'dynamodb:Scan'
                   - 'dynamodb:Query'
                   - 'dynamodb:UpdateItem'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
                 Resource: '*'
