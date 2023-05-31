@@ -63,23 +63,6 @@ const processMessages = async (phoneNumberId, messages) => {
       text: {body: 'Este es un mensaje automatizado,gracias por tu respuesta!'},
     }).then((result) => {
       console.log(`Status code: ${result}`);
-      try {
-        const params = {
-          TableName: TABLE_NAME,
-          Item: {
-            'id': {S: phoneNumberId},
-            'type': {S: 'RECIPIENT-' + from},
-            'document': {S: msgBody},
-          },
-        };
-        ddb.putItem(params, function(err, data) {
-          if (err) {
-            console.info('Error Putting item', err);
-          }
-        });
-      } catch (e) {
-        console.info('Error Putting item', err);
-      }
     }).catch((err) =>
     // eslint-disable-next-line max-len
       console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
