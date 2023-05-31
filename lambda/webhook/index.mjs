@@ -74,11 +74,11 @@ const processMessages = async (phoneNumberId, messages) => {
         };
         ddb.putItem(params, function(err, data) {
           if (err) {
-            console.error('Error Putting item', err);
+            console.info('Error Putting item', err);
           }
         });
       } catch (e) {
-        console.error('Error Putting item', err);
+        console.info('Error Putting item', err);
       }
     }).catch((err) =>
     // eslint-disable-next-line max-len
@@ -95,23 +95,19 @@ const processMessages = async (phoneNumberId, messages) => {
 const processErrors = (phoneNumberId, status) => {
   // eslint-disable-next-line max-len
   console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
-  try {
-    const params = {
-      TableName: TABLE_NAME,
-      Item: {
-        'id': {S: phoneNumberId},
-        'type': {S: 'RECIPIENT-' + status.recipient_id},
-        'document': {S: status},
-      },
-    };
-    ddb.putItem(params, function(err, data) {
-      if (err) {
-        console.log('Error Putting item', err);
-      }
-    });
-  } catch (e) {
-    console.error('Error Putting item', err);
-  }
+  const params = {
+    TableName: TABLE_NAME,
+    Item: {
+      'id': {S: phoneNumberId},
+      'type': {S: 'RECIPIENT-' + status.recipient_id},
+      'document': {S: status},
+    },
+  };
+  ddb.putItem(params, function(err, data) {
+    if (err) {
+      console.log('Error Putting item', err);
+    }
+  });
 };
 
 export const handler = (event) => {
