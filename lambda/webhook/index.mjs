@@ -80,13 +80,12 @@ export const handler = async (event) => {
 
     const phoneNumberId = value.metadata.phone_number_id;
     if (value.messages) {
-      processMessages(phoneNumberId, value.messages);
       if (value.messages &&
         value.messages[0] &&
         value.messages[0].text &&
         value.messages[0].from) {
-        const from = messages[0].from; // extract the phone number
-        const msgBody = messages[0].text.body; // extract the message text
+        const from = value.messages[0].from; // extract the phone number
+        const msgBody = value.messages[0].text.body; // extract the message text
 
         console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
         const token = process.env.WHATSAPP_TOKEN;
@@ -100,7 +99,6 @@ export const handler = async (event) => {
           text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
         }).then((result) => {
           console.log(`Status code: ${result}`);
-          // putItems(params);
         }).catch((err) =>
           console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
       }
