@@ -21,10 +21,6 @@ Resources:
             VERIFY_TOKEN: "OVERRIDE"
             WHATSAPP_TOKEN: "OVERRIDE"
       Timeout: 3
-      Role:
-        Fn::GetAtt:
-        - LambdaExecutionRole
-        - Arn
       CodeUri: .
       Architectures: 
         - "arm64"
