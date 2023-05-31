@@ -42,4 +42,4 @@ jobs:
       - name: Package and Deploy
         run: |
           cd ./lambda/webhook/ 
-          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --on-failure DELETE
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --on-failure ROLLBACK
