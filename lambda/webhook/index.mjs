@@ -7,7 +7,7 @@ const TABLE_NAME = 'messages';
 
 aws.config.update({region: process.env.AWS_REGION});
 // eslint-disable-next-line no-unused-vars
-const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+const ddb = new aws.DynamoDB({apiVersion: '2012-08-10'});
 
 const doPostRequest = (host, path, data) => {
   return new Promise((resolve, reject) => {
