@@ -35,8 +35,8 @@ const doPostRequest = (host, path, data) => {
 
 export const handler = async (event) => {
     console.log(event)
-    const method = event.requestContext.http.method;
-    const path = event.requestContext.http.path;
+    const method = event.requestContext.httpMethod;
+    const path = event.path;
     if (path !== "/webhook") {
         return {
             statusCode: 403
