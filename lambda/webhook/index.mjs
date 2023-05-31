@@ -1,9 +1,10 @@
+/* eslint-disable max-len */
 import {createRequire} from 'module';
 
 const require = createRequire(import.meta.url);
 const https = require('https');
 const aws = require('aws-sdk');
-const TABLE_NAME = 'messages';
+// const TABLE_NAME = 'messages';
 
 aws.config.update({region: process.env.AWS_REGION});
 // eslint-disable-next-line no-unused-vars
@@ -39,7 +40,7 @@ const doPostRequest = (host, path, data) => {
 };
 
 /**
- *
+ * See parsing of Components in https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/components
  * @param {*} phoneNumberId represents the send associated to this flow.
  * @param {*} messages is an array of messages
  */
@@ -53,47 +54,23 @@ const processMessages = async (phoneNumberId, messages) => {
 
     console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
     const token = process.env.WHATSAPP_TOKEN;
-    const path = '/v12.0/' +
+    const path = '/v16.0/' +
       phoneNumberId +
       '/messages?access_token=' +
       token;
     await doPostRequest('graph.facebook.com', path, {
       messaging_product: 'whatsapp',
       to: from,
-      text: {body: 'Este es un mensaje automatizado,gracias por tu respuesta!'},
+      text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
     }).then((result) => {
       console.log(`Status code: ${result}`);
+      // putItems(params);
     }).catch((err) =>
-    // eslint-disable-next-line max-len
       console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
   }
 };
 
-
-/**
- *
- * @param {*} phoneNumberId represents the send associated to this flow.
- * @param {*} status represents a single failed status
- */
-const processErrors = (phoneNumberId, status) => {
-  // eslint-disable-next-line max-len
-  console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
-  const params = {
-    TableName: TABLE_NAME,
-    Item: {
-      'id': {S: phoneNumberId},
-      'type': {S: 'RECIPIENT-' + status.recipient_id},
-      'document': {S: status},
-    },
-  };
-  ddb.putItem(params, function(err, data) {
-    if (err) {
-      console.log('Error Putting item', err);
-    }
-  });
-};
-
-export const handler = (event) => {
+export const handler = async (event) => {
   console.log(event);
   const method = event.requestContext.httpMethod;
   const path = event.path;
@@ -104,10 +81,12 @@ export const handler = (event) => {
   }
 
   if (method === 'GET') {
+    console.log('Subscribing');
     const mode = event.queryStringParameters['hub.mode'];
     const token = event.queryStringParameters['hub.verify_token'];
     const challenge = event.queryStringParameters['hub.challenge'];
     const verifyToken = process.env.VERIFY_TOKEN;
+    console.log('Ready to go...');
     if (mode === 'subscribe' && token === verifyToken) {
       // Respond with 200 OK and challenge token from the request
       return {
