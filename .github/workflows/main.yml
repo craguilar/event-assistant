@@ -35,8 +35,8 @@ jobs:
         env:
           CI: true
         run: |
-          EXISTS=`aws s3 ls | grep event-assistant-webhook-code`
-          if [ -z "$EXISTS" ]; then aws s3 mb s3://event-assistant-webhook-code; fi
+          EXISTS=`aws s3 ls | grep -zq billing && echo "yes" || echo "no"`
+          if ["$EXISTS" = "no" ]; then aws s3 mb s3://event-assistant-webhook-code; fi
       # Runs a single command using the runners shell
       - name: Build
         env:
