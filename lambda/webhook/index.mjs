@@ -51,8 +51,7 @@ const processMessages = async (phoneNumberId, messages) => {
     const from = messages[0].from; // extract the phone number
     const msgBody = messages[0].text.body; // extract the message text
 
-    // eslint-disable-next-line max-len
-    console.log('Reply from:' + from + ' to ' +phoneNumberId+ ':' + JSON.stringify(msgBody, null, 2)+' ');
+    console.log('Reply from:' + from + ':' + JSON.stringify(msgBody, null, 2));
     const token = process.env.WHATSAPP_TOKEN;
     const path = '/v12.0/' +
       phoneNumberId +
@@ -74,7 +73,7 @@ const processMessages = async (phoneNumberId, messages) => {
       };
       ddb.putItem(params, function(err, data) {
         if (err) {
-          console.log('Error Putting item', err);
+          console.error('Error Putting item', err);
         }
       });
     }).catch((err) =>
@@ -107,7 +106,7 @@ const processErrors = (phoneNumberId, status) => {
   });
 };
 
-export const handler = async (event) => {
+export const handler = (event) => {
   console.log(event);
   const method = event.requestContext.httpMethod;
   const path = event.path;
