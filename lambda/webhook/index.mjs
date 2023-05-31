@@ -34,7 +34,7 @@ const doPostRequest = (host, path, data) => {
 };
 
 export const handler = async (event) => {
-    console.log(JSON.parse(event))
+    console.log(event)
     const method = event.requestContext.httpMethod;
     const path = event.path;
     if (path !== "/webhook") {
