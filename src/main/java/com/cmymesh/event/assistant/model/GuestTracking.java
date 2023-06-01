@@ -64,9 +64,8 @@ public class GuestTracking implements Serializable {
             notificationsSent.add(response);
             return;
         }
-        var isSuccess = response.isFailedMessage();
-        if (!isSuccess) {
-            response.setNumberOfErrorRetries(response.getNumberOfErrorRetries() + 1);
+        if (response.isFailedMessage()) {
+            response.setNumberOfErrorRetries(notification.getNumberOfErrorRetries() + 1);
         }
         notificationsSent.set(i, response);
     }
