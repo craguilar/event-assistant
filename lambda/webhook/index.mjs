@@ -40,11 +40,7 @@ const doPostRequest = (host, path, data) => {
 };
 
 const putItems = (params) => {
-  try {
-    return ddb.putItem(params);
-  } catch (e) {
-    console.log(e);
-  }
+  return ddb.putItem(params);
 };
 
 /**
@@ -106,7 +102,7 @@ export const handler = async (event) => {
       return {statusCode: 200};
     }
     const value = changes[0].value;
-    console.log('General tree:' + JSON.stringify(value, null, 2));
+    console.log('Value object :' + JSON.stringify(value, null, 2));
 
     const phoneNumberId = value.metadata.phone_number_id;
     if (value.messages) {
@@ -114,21 +110,20 @@ export const handler = async (event) => {
         value.messages[0] &&
         value.messages[0].text &&
         value.messages[0].from) {
+        const contact = value.contacts[0] ? value.contacts[0].profile.name : '';
         const from = value.messages[0].from; // extract the phone number
         const msgBody = value.messages[0].text.body; // extract the message text
 
-        console.log('Reply from:' + from + ': ' + JSON.stringify(msgBody, null, 2));
+        console.log(`Reply from ${contact}(${from}): ` + JSON.stringify(msgBody, null, 2));
         const token = process.env.WHATSAPP_TOKEN;
-        const path = '/v16.0/' +
-          phoneNumberId +
-          '/messages?access_token=' +
-          token;
+        const path = '/v16.0/' + phoneNumberId +'/messages?access_token=' +token;
+
         await doPostRequest('graph.facebook.com', path, {
           messaging_product: 'whatsapp',
           to: from,
-          text: {body: 'Este es un mensaje automatizado, gracias por tu respuesta!'},
+          text: {body: `Hola ${contact}! Este es un mensaje automatizado, gracias por tu respuesta!`},
         }).then((result) => {
-          console.log(`Status code: ${result}`);
+          console.log(`WhatsApp status code: ${result}`);
           const params = {
             TableName: TABLE_NAME,
             Item: {
@@ -137,7 +132,9 @@ export const handler = async (event) => {
               'document': {S: msgBody},
             },
           };
-          putItems(params);
+          return putItems(params);
+        }).then(() => {
+          console.log('Succesfully put the message in dynamodb');
         }).catch((err) =>
           console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
       }

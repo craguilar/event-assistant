@@ -26,7 +26,6 @@ Resources:
       AutoPublishAliasAllProperties: false
       AutoPublishAlias: live
       Policies:
-      # Give just CRUD permissions to one table
       - DynamoDBCrudPolicy:
           TableName: !Ref WebHookTable
       DeploymentPreference:
