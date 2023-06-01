@@ -42,7 +42,7 @@ public class GuestRepositoryLocalImpl implements GuestRepository {
                                     .build()
                     ).toList();
         } catch (URISyntaxException | IOException e) {
-            LOG.error("{}", e);
+            LOG.error("", e);
             throw new RuntimeException(e);
         }
     }

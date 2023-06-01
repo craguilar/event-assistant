@@ -3,7 +3,6 @@ package com.cmymesh.event.assistant.repository;
 import com.cmymesh.event.assistant.ApplicationConstants;
 import com.cmymesh.event.assistant.model.GuestTracking;
 import com.cmymesh.event.assistant.model.MessageResponse;
-import com.cmymesh.event.assistant.model.MessageStatus;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
@@ -19,7 +18,6 @@ import com.sleepycat.persist.evolve.Renamer;
 import com.sleepycat.persist.model.EntityModel;
 import com.sleepycat.persist.raw.RawObject;
 import com.sleepycat.persist.raw.RawStore;
-import com.sleepycat.persist.raw.RawType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
