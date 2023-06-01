@@ -48,29 +48,6 @@ const putItems = async (params) => {
   }
 };
 
-
-/**
-   *
-   * @param {*} phoneNumberId represents the send associated to this flow.
-   * @param {*} status represents a single failed status
-   */
-const processErrors = (phoneNumberId, status) => {
-  console.log(`Failure to process message to: ${status.recipient_id} : ${JSON.stringify(status, null, 2)}`);
-  const params = {
-    TableName: TABLE_NAME,
-    Item: {
-      'id': {S: phoneNumberId},
-      'type': {S: 'RECIPIENT-' + status.recipient_id},
-      'document': {S: JSON.stringify(status, null, 2)},
-    },
-  };
-  putItems(params).then((result) => {
-    console.log('Success when putting record to dynamo');
-  }).catch((err) =>
-    console.error(`Error putting the records => ${err}`));
-};
-
-
 export const handler = async (event) => {
   console.log(event);
   const method = event.requestContext.httpMethod;
@@ -146,6 +123,19 @@ export const handler = async (event) => {
       }
     } else if (value.statuses && value.statuses[0] && value.statuses[0].status === 'failed') {
       processErrors(phoneNumberId, value.statuses[0]);
+      console.log(`Failure to process message to: ${value.statuses[0].recipient_id} : ${JSON.stringify(value.statuses[0], null, 2)}`);
+      const params = {
+        TableName: TABLE_NAME,
+        Item: {
+          'id': {S: phoneNumberId},
+          'type': {S: 'RECIPIENT-' + value.statuses[0].recipient_id},
+          'document': {S: JSON.stringify(value.statuses[0], null, 2)},
+        },
+      };
+      putItems(params).then((result) => {
+        console.log('Success when putting record to dynamo');
+      }).catch((err) =>
+        console.error(`Error putting the records => ${err}`));
     }
     return {statusCode: 200};
   } else {
