@@ -2,12 +2,13 @@ package com.cmymesh.event.assistant.model;
 
 import com.sleepycat.persist.model.Persistent;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Set;
 
-@Persistent(version = 3)
+@Persistent(version = 4)
 @Getter
 @ToString
 public class MessageResponse implements Serializable {
@@ -16,6 +17,8 @@ public class MessageResponse implements Serializable {
     private String status;
     private String messagingServiceSid;
     private String sid;
+    @Setter
+    private int numberOfErrorRetries;
 
     public static final Set<String> FAILED_STATES = Set.of("failed", "undelivered");
 
@@ -25,6 +28,7 @@ public class MessageResponse implements Serializable {
         this.status = status;
         this.messagingServiceSid = messagingServiceSid;
         this.sid = sid;
+        this.numberOfErrorRetries = 0;
     }
 
     private MessageResponse() {

@@ -17,6 +17,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class NotificationService {
@@ -33,23 +34,27 @@ public class NotificationService {
 
     public void sendNotifications(List<Guest> guests, NotificationTemplate template) {
         int notificationsSent = 0;
-        LOG.info("Sending notifications to {} guests", guests.size());
+        int notificationsSkipped = 0;
+        LOG.info("[{}] Preparing notifications to {} guests ", template.templateName(), guests.size());
         for (Guest guest : guests) {
             var guestTracking = eventAssistantService.get(guest.id());
-            if (guest.isTentative() || guestTracking != null && guestTracking.containsSuccessNotification(template.templateName())) {
-                LOG.trace("Notification {}: Already sent to {} or isTentative", template.templateName(), guestTracking);
+            var notificationAlreadySent = guestTracking != null && guestTracking.containsSuccessNotification(template.templateName());
+            var notificationRetriesExhausted = guestTracking != null && guestTracking.containsNonRetryableErrorNotification(template.templateName());
+            if (guest.isTentative() || notificationAlreadySent || notificationRetriesExhausted) {
+                LOG.trace("Notification {}: For {} Already sent or isTentative or retries exhausted ", template.templateName(), guest.getFullName());
+                notificationsSkipped++;
                 continue;
             }
-            var guestName = "%s %s".formatted(guest.firstName(), guest.lastName());
+            var guestName = guest.getFullName();
             // Handle add or Update logic
             if (guestTracking == null) {
-                guestTracking = new GuestTracking(guest.id(), guestName, new ArrayList<>());
+                guestTracking = new GuestTracking(guest.id(), guestName, new Date(), new ArrayList<>());
             }
             MessageResponse response = null;
 
             try {
                 response = send(guest, template);
-                notificationsSent = !response.isFailedMessage() ? notificationsSent + 1 : 0;
+                notificationsSent = !response.isFailedMessage() ? notificationsSent + 1 : notificationsSent;
             } catch (Exception e) {
                 LOG.error("When processing {}", guest);
             } finally {
@@ -60,7 +65,7 @@ public class NotificationService {
             }
 
         }
-        LOG.info("Notifications sent {}", notificationsSent);
+        LOG.info("Notifications sent {} , skipped {}", notificationsSent, notificationsSkipped);
     }
 
     private MessageResponse send(Guest guest, NotificationTemplate template) throws InterruptedException {

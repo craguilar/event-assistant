@@ -9,14 +9,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GuestValidations {
 
     private static final Logger LOG = LoggerFactory.getLogger(GuestValidations.class);
     private static final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
-    public static final Function<Guest, GuestValidResponse> VALIDATE_PHONE  = (Guest g) -> {
-        Phonenumber.PhoneNumber phone ;
+    public static final Function<Guest, GuestValidResponse> VALIDATE_PHONE = (Guest g) -> {
+        Phonenumber.PhoneNumber phone;
         try {
             phone = phoneNumberUtil.parse(
                     g.phoneNumber(),
@@ -49,8 +50,23 @@ public class GuestValidations {
 
     public static void failedTracking(EventAssistantRepository assistantService) {
         var guests = assistantService.listAll().stream().filter(GuestTracking::containsErrorNotification).toList();
-        for (GuestTracking guest : guests) {
+        for (var guest : guests) {
             LOG.info("TRACKING: {}", guest.getName());
         }
+    }
+
+    /**
+     * Extracts GUESTS - TRACKING = {PENDING TRACKING} and TRACKING - GUESTS = {NOT IN SOURCE}.
+     */
+    public static void guestAndTrackingReconciliation(List<Guest> guests, EventAssistantRepository assistantService) {
+        var tracking = assistantService.listAll();
+        var guestSet = guests.stream().map(Guest::id).collect(Collectors.toSet());
+        var trackingSet = tracking.stream().map(GuestTracking::getGuestId).collect(Collectors.toSet());
+        guests.stream()
+                .filter(val -> !trackingSet.contains(val.id()))
+                .forEach(guest -> LOG.info("PENDING_TRACKING: {} {}", guest.firstName(), guest.lastName()));
+        tracking.stream()
+                .filter(val -> !guestSet.contains(val.getGuestId()))
+                .forEach(guest -> LOG.info("GUEST_NOT_IN_SRC: {}", guest.getName()));
     }
 }

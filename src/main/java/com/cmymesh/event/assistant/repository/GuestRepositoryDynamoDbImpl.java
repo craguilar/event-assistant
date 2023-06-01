@@ -56,6 +56,7 @@ public class GuestRepositoryDynamoDbImpl implements GuestRepository {
                     item.get("phone").s(),
                     item.get("isTentative").bool(),
                     Integer.parseInt(item.get("numberOfSeats").n()));
+
             guests.add(guest);
         }
         return guests;

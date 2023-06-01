@@ -18,6 +18,10 @@ public record Guest(String id, String firstName, String lastName,
         return fn.apply(this);
     }
 
+    public String getFullName() {
+        return "%s %s".formatted(this.firstName(), this.lastName());
+    }
+
 }
 
 
