@@ -131,7 +131,7 @@ export const handler = async (event) => {
           'document': {S: JSON.stringify(value.statuses[0], null, 2)},
         },
       };
-      putItems(params).then((result) => {
+      await putItems(params).then((result) => {
         console.log('Success when putting record to dynamo');
       }).catch((err) =>
         console.error(`Error putting the records => ${err}`));
