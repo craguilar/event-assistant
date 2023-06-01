@@ -39,9 +39,15 @@ const doPostRequest = (host, path, data) => {
   });
 };
 
-const putItems = (params) => {
-  return ddb.putItem(params);
+const putItems = async (params) => {
+  try {
+    return await ddb.putItem(params).promise();
+    // Handle your result here!
+  } catch (err) {
+    console.log(err);
+  }
 };
+
 
 /**
    *
