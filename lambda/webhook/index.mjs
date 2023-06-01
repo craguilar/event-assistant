@@ -55,13 +55,13 @@ const putItems = async (params) => {
    * @param {*} status represents a single failed status
    */
 const processErrors = (phoneNumberId, status) => {
-  console.log('Failure to process from:' + status.recipient_id + ':' + JSON.stringify(status, null, 2));
+  console.log(`Failure to process message to: ${status.recipient_id} : ${JSON.stringify(status, null, 2)}`);
   const params = {
     TableName: TABLE_NAME,
     Item: {
       'id': {S: phoneNumberId},
       'type': {S: 'RECIPIENT-' + status.recipient_id},
-      'document': {S: status},
+      'document': {S: JSON.stringify(status, null, 2)},
     },
   };
   putItems(params).then((result) => {
@@ -144,9 +144,7 @@ export const handler = async (event) => {
         }).catch((err) =>
           console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
       }
-    } else if (value.statuses &&
-      value.statuses[0] &&
-      value.statuses[0].status === 'failed') {
+    } else if (value.statuses && value.statuses[0] && value.statuses[0].status === 'failed') {
       processErrors(phoneNumberId, value.statuses[0]);
     }
     return {statusCode: 200};
