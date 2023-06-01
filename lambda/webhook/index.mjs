@@ -122,7 +122,6 @@ export const handler = async (event) => {
           console.error(`Error for the event: ${JSON.stringify(err)} => ${err}`));
       }
     } else if (value.statuses && value.statuses[0] && value.statuses[0].status === 'failed') {
-      processErrors(phoneNumberId, value.statuses[0]);
       console.log(`Failure to process message to: ${value.statuses[0].recipient_id} : ${JSON.stringify(value.statuses[0], null, 2)}`);
       const params = {
         TableName: TABLE_NAME,
@@ -132,7 +131,7 @@ export const handler = async (event) => {
           'document': {S: JSON.stringify(value.statuses[0], null, 2)},
         },
       };
-      await putItems(params).then((result) => {
+      putItems(params).then((result) => {
         console.log('Success when putting record to dynamo');
       }).catch((err) =>
         console.error(`Error putting the records => ${err}`));
