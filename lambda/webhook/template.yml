@@ -6,7 +6,6 @@ Globals:
   Api:
     # API Gateway regional endpoints
     EndpointConfiguration: REGIONAL
-    
 
 Resources:
   WhatsAppWebHookLambda:
@@ -26,6 +25,7 @@ Resources:
         - "arm64"
       AutoPublishAliasAllProperties: false
       AutoPublishAlias: live
+      Policies: DynamoDBCrudPolicy
       DeploymentPreference:
         Enabled: true
         Type: Canary10Percent5Minutes
@@ -57,37 +57,3 @@ Resources:
         - 
           AttributeName: "type"
           KeyType: RANGE
-
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: 'EventAssistant-WhatsAppWebhook-Execution'
-      Description: Creating service role in IAM for AWS Lambda
-      AssumeRolePolicyDocument:
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: [lambda.amazonaws.com]
-          Action: sts:AssumeRole
-      Path: /
-      Policies: 
-        - PolicyName: LambdaCustomExecution
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'dynamodb:BatchGetItem'
-                  - 'dynamodb:BatchWriteItem'
-                  - 'dynamodb:ConditionCheckItem'
-                  - 'dynamodb:PutItem'
-                  - 'dynamodb:DescribeTable'
-                  - 'dynamodb:DeleteItem'
-                  - 'dynamodb:GetItem'
-                  - 'dynamodb:Scan'
-                  - 'dynamodb:Query'
-                  - 'dynamodb:UpdateItem'
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                Resource: '*'
