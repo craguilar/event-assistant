@@ -96,7 +96,7 @@ export const handler = async (event) => {
         const contact = value.contacts[0] ? value.contacts[0].profile.name : '';
         const from = value.messages[0].from; // extract the phone number
         const msgBody = value.messages[0].text.body; // extract the message text
-
+        const timestamp = value.messages[0].timestamp;
         console.log(`Reply from ${contact}(${from}): ` + JSON.stringify(msgBody, null, 2));
         const token = process.env.WHATSAPP_TOKEN;
         const path = '/v16.0/' + phoneNumberId +'/messages?access_token=' +token;
@@ -111,7 +111,7 @@ export const handler = async (event) => {
             TableName: TABLE_NAME,
             Item: {
               'id': {S: phoneNumberId},
-              'type': {S: 'RECIPIENT-' + from},
+              'type': {S: `RECIPIENT-${from}-${timestamp}`},
               'document': {S: msgBody},
             },
           };
@@ -128,11 +128,11 @@ export const handler = async (event) => {
         TableName: TABLE_NAME,
         Item: {
           'id': {S: phoneNumberId},
-          'type': {S: 'RECIPIENT-' + value.statuses[0].recipient_id},
+          'type': {S: `RECIPIENT-${value.statuses[0].recipient_id}-${value.statuses[0].timestamp}`},
           'document': {S: JSON.stringify(value.statuses[0], null, 2)},
         },
       };
-      putItems(params).then((result) => {
+      await putItems(params).then((result) => {
         console.log('Success when putting record to dynamo');
       }).catch((err) =>
         console.error(`Error putting the records => ${err}`));
