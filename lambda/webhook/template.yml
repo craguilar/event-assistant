@@ -25,7 +25,10 @@ Resources:
         - "arm64"
       AutoPublishAliasAllProperties: false
       AutoPublishAlias: live
-      Policies: DynamoDBCrudPolicy
+      Policies:
+      # Give just CRUD permissions to one table
+      - DynamoDBCrudPolicy:
+          TableName: !Ref WebHookTable
       DeploymentPreference:
         Enabled: true
         Type: Canary10Percent5Minutes

@@ -35,7 +35,6 @@ jobs:
           aws-region: us-east-2 
       - name: Install application
         run: cd lambda/webhook && npm install
-      # Runs a single command using the runners shell
       - name: Build
         env:
           CI: true
