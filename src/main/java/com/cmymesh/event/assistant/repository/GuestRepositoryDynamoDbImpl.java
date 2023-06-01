@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GuestRepositoryDynamoDbImpl implements GuestRepository {
 
     private final DynamoDbClient ddb;
+    private static final Set<String>  FIRST_NAME_NOT_ALLOWED_LIST = Set.of("Robert","James","Kit");
 
     public GuestRepositoryDynamoDbImpl() {
         /*
@@ -56,8 +58,9 @@ public class GuestRepositoryDynamoDbImpl implements GuestRepository {
                     item.get("phone").s(),
                     item.get("isTentative").bool(),
                     Integer.parseInt(item.get("numberOfSeats").n()));
-
-            guests.add(guest);
+            if(!FIRST_NAME_NOT_ALLOWED_LIST.contains(guest.firstName())){
+                guests.add(guest);
+            }
         }
         return guests;
     }

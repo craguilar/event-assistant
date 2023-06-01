@@ -23,14 +23,19 @@ public class App {
     public static void main(String[] args) throws ParseException, InterruptedException {
         var cmd = CmdOptions.parseCmdOptions(args);
         var eventId = cmd.getOptionValue(CmdOptions.EVENT_ID_OPTION);
-        var guestStorageMode = GuestStorageMode.valueOf(cmd.getOptionValue(CmdOptions.STORAGE_MODE_OPTION, GuestStorageMode.DYNAMODB.toString()));
-        var runningMode = AppRunningMode.valueOf(cmd.getOptionValue(CmdOptions.APP_RUNNING_MODE_OPTION, AppRunningMode.GUEST_VALIDATE.toString()));
+        var guestStorageMode = GuestStorageMode
+                .valueOf(cmd.getOptionValue(CmdOptions.STORAGE_MODE_OPTION, GuestStorageMode.DYNAMODB.toString()));
+        var runningMode = AppRunningMode
+                .valueOf(cmd.getOptionValue(CmdOptions.APP_RUNNING_MODE_OPTION, AppRunningMode.GUEST_VALIDATE.toString()));
         var dataStorePath = new File("./bdb.data");
         requireNonNull(eventId, "Event Id must be not null");
+        log.info("Running program with parameters eventId [{}] , storageMode [{}] ,runningMode [{}]"
+                ,eventId,guestStorageMode,runningMode);
         run(eventId, dataStorePath, guestStorageMode, runningMode);
     }
 
-    private static void run(String eventId, File dataStorePath, GuestStorageMode guestStorageMode, AppRunningMode runningMode) throws InterruptedException {
+    private static void run(String eventId, File dataStorePath, GuestStorageMode guestStorageMode,
+                            AppRunningMode runningMode) throws InterruptedException {
 
         try (var eventAssistant = new EventAssistantRepository(dataStorePath)) {
             var templateService = new TemplateRepository();
@@ -46,10 +51,12 @@ public class App {
                 case TRACKING_DUMP -> eventAssistant.dump();
                 case SEND_NOTIFICATIONS -> {
                     for (NotificationTemplate template : templateService.listTemplates(eventId)) {
-                        log.info("Before sending notification [{}] as [{}] breathe for 1 minute.... ", template.templateName(), template.type());
+                        log.info("Before sending notification [{}] as [{}] breathe for 1 minute.... ",
+                                template.templateName(), template.type());
                         Thread.sleep(Duration.ofMinutes(1).toMillis());
                         notificationService.sendNotifications(guestService.listGuests(eventId), template);
                     }
+
                 }
                 default -> throw new RuntimeException("Invalid runningMode");
             }

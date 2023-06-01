@@ -35,6 +35,7 @@ public class NotificationService {
     public void sendNotifications(List<Guest> guests, NotificationTemplate template) {
         int notificationsSent = 0;
         int notificationsSkipped = 0;
+        int error = 0;
         LOG.info("[{}] Preparing notifications to {} guests ", template.templateName(), guests.size());
         for (Guest guest : guests) {
             var guestTracking = eventAssistantService.get(guest.id());
@@ -54,7 +55,11 @@ public class NotificationService {
 
             try {
                 response = send(guest, template);
-                notificationsSent = !response.isFailedMessage() ? notificationsSent + 1 : notificationsSent;
+                if (!response.isFailedMessage()) {
+                    notificationsSent++;
+                } else {
+                    error++;
+                }
             } catch (Exception e) {
                 LOG.error("When processing {}", guest);
             } finally {
@@ -65,8 +70,9 @@ public class NotificationService {
             }
 
         }
-        LOG.info("Notifications sent {} , skipped {}", notificationsSent, notificationsSkipped);
+        LOG.info("Notifications sent {} , skipped {}, error {}", notificationsSent, notificationsSkipped, error);
     }
+
 
     private MessageResponse send(Guest guest, NotificationTemplate template) throws InterruptedException {
         GuestValidResponse guestValidation = guest.isValid(GuestValidations.VALIDATE_PHONE);

@@ -27,6 +27,7 @@ public class GuestRepositoryLocalImpl implements GuestRepository {
             Objects.requireNonNull(lines);
             return lines
                     .map(line -> line.split(","))
+                    .filter(fields -> fields.length == 9)
                     .map(fields ->
                             Guest.builder()
                                     .id(fields[0])
@@ -41,7 +42,7 @@ public class GuestRepositoryLocalImpl implements GuestRepository {
                                     .build()
                     ).toList();
         } catch (URISyntaxException | IOException e) {
-            LOG.error("", e);
+            LOG.error("{}", e);
             throw new RuntimeException(e);
         }
     }
