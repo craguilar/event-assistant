@@ -127,7 +127,7 @@ export const handler = async (event) => {
         TableName: TABLE_NAME,
         Item: {
           'id': {S: phoneNumberId},
-          'type': {S: `RECIPIENT-${value.statuses[0].recipient_id}-${value.statuses[0].timestamp}`},
+          'type': {S: `RECIPIENT-ERROR-${value.statuses[0].recipient_id}-${value.statuses[0].timestamp}`},
           'document': {S: JSON.stringify(value.statuses[0], null, 2)},
         },
       };
