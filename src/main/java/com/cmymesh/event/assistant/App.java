@@ -51,10 +51,11 @@ public class App {
                 case TRACKING_DUMP -> eventAssistant.dump();
                 case SEND_NOTIFICATIONS -> {
                     for (NotificationTemplate template : templateService.listTemplates(eventId)) {
-                        log.info("Before sending notification [{}] as [{}] breathe for 1 minute.... ",
-                                template.templateName(), template.type());
+                        var guests = guestService.listGuests(eventId);
+                        log.info("Before sending notification [{}] as [{}] to [{}] guests, breathe for 1 minute.... ",
+                                template.templateName(), template.type(),guests.size());
                         Thread.sleep(Duration.ofMinutes(1).toMillis());
-                        notificationService.sendNotifications(guestService.listGuests(eventId), template);
+                        notificationService.sendNotifications(guests, template);
                     }
 
                 }
