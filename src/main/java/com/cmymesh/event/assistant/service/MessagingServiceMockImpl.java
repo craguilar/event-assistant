@@ -1,7 +1,6 @@
 package com.cmymesh.event.assistant.service;
 
 import com.cmymesh.event.assistant.model.MessageResponse;
-import com.cmymesh.event.assistant.model.MessageStatus;
 import com.cmymesh.event.assistant.model.NotificationTemplate;
 import com.cmymesh.event.assistant.model.NotificationTemplateComponent;
 import lombok.extern.slf4j.Slf4j;

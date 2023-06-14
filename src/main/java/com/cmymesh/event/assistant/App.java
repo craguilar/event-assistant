@@ -38,8 +38,7 @@ public class App {
                             AppRunningMode runningMode) throws InterruptedException {
 
         try (var eventAssistant = new EventAssistantRepository(dataStorePath)) {
-            var templateService = new TemplateRepository();
-            var notificationService = new NotificationService(eventAssistant);
+
             var guestService = GuestRepositoryFactory.guestService(guestStorageMode);
 
             // Execute
@@ -50,6 +49,8 @@ public class App {
                         GuestValidations.guestAndTrackingReconciliation(guestService.listGuests(eventId), eventAssistant);
                 case TRACKING_DUMP -> eventAssistant.dump();
                 case SEND_NOTIFICATIONS -> {
+                    var templateService = new TemplateRepository();
+                    var notificationService = new NotificationService(eventAssistant);
                     for (NotificationTemplate template : templateService.listTemplates(eventId)) {
                         var guests = guestService.listGuests(eventId);
                         log.info("Before sending notification [{}] as [{}] to [{}] guests, breathe for 1 minute.... ",
