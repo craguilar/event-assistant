@@ -90,7 +90,12 @@ public class EventAssistantRepository implements Closeable {
     }
 
     public boolean delete(String guestId) {
-        return dao.personById.delete(guestId);
+        var status = dao.personById.delete(guestId);
+        if (status) {
+            // We need traces for deleted elements
+            LOG.info("Deleted {}", guestId);
+        }
+        return status;
     }
 
     @Override
