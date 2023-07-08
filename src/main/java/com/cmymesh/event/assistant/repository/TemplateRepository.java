@@ -43,7 +43,7 @@ public class TemplateRepository {
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        LOG.info("Loaded {} events and {} templates", db.size(), count.get());
+        LOG.debug("Loaded {} events and {} templates", db.size(), count.get());
     }
 
     public List<NotificationTemplate> listTemplates(String eventId) {

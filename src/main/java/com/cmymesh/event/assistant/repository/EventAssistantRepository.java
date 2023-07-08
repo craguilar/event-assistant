@@ -18,6 +18,7 @@ import com.sleepycat.persist.evolve.Renamer;
 import com.sleepycat.persist.model.EntityModel;
 import com.sleepycat.persist.raw.RawObject;
 import com.sleepycat.persist.raw.RawStore;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class EventAssistantRepository implements Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventAssistantRepository.class);
@@ -74,7 +76,12 @@ public class EventAssistantRepository implements Closeable {
     }
 
     public void save(GuestTracking guestTracking) {
-        dao.personById.put(guestTracking);
+        try {
+            dao.personById.put(guestTracking);
+        } catch (Exception e) {
+            log.error("{}", guestTracking, e);
+            throw e;
+        }
     }
 
     public List<GuestTracking> listAll() {

@@ -30,7 +30,7 @@ public class App {
         var dataStorePath = new File("./bdb.data");
         requireNonNull(eventId, "Event Id must be not null");
         log.info("Running program with parameters eventId [{}] , storageMode [{}] ,runningMode [{}]"
-                ,eventId,guestStorageMode,runningMode);
+                , eventId, guestStorageMode, runningMode);
         run(eventId, dataStorePath, guestStorageMode, runningMode);
     }
 
@@ -40,7 +40,6 @@ public class App {
         try (var eventAssistant = new EventAssistantRepository(dataStorePath)) {
 
             var guestService = GuestRepositoryFactory.guestService(guestStorageMode);
-
             // Execute
             switch (runningMode) {
                 case GUEST_VALIDATE -> GuestValidations.validate(guestService.listGuests(eventId));
@@ -51,10 +50,12 @@ public class App {
                 case SEND_NOTIFICATIONS -> {
                     var templateService = new TemplateRepository();
                     var notificationService = new NotificationService(eventAssistant);
-                    for (NotificationTemplate template : templateService.listTemplates(eventId)) {
+                    var templates = templateService.listTemplates(eventId);
+                    log.info("Sending {} templates for {}", templates.size(), eventId);
+                    for (NotificationTemplate template : templates) {
                         var guests = guestService.listGuests(eventId);
                         log.info("Before sending notification [{}] as [{}] to [{}] guests, breathe for 1 minute.... ",
-                                template.templateName(), template.type(),guests.size());
+                                template.templateName(), template.type(), guests.size());
                         Thread.sleep(Duration.ofMinutes(1).toMillis());
                         notificationService.sendNotifications(guests, template);
                     }

@@ -42,7 +42,7 @@ public class NotificationService {
             var notificationAlreadySent = guestTracking != null && guestTracking.containsSuccessNotification(template.templateName());
             var notificationRetriesExhausted = guestTracking != null && guestTracking.containsNonRetryableErrorNotification(template.templateName());
             if (guest.isTentative() || notificationAlreadySent || notificationRetriesExhausted) {
-                LOG.trace("Notification {}: For {} Already sent or isTentative or retries exhausted ", template.templateName(), guest.getFullName());
+                LOG.debug("Notification {}: For {} Already sent or isTentative or retries exhausted ", template.templateName(), guest.getFullName());
                 notificationsSkipped++;
                 continue;
             }
