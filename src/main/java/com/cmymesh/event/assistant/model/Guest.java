@@ -5,11 +5,20 @@ import lombok.Builder;
 import java.util.function.Function;
 
 @Builder
-public record Guest(String id, String firstName, String lastName,
+public record Guest(String id,
+                    String firstName,
+                    String lastName,
                     String guestOf,
-                    String country, String state,
+                    String country,
+                    String state,
                     String phoneNumber,
-                    boolean isTentative, int seats) {
+                    boolean isTentative,
+                    boolean isNotAttending,
+                    int seats) {
+
+    public boolean shouldSkipNotifictaion(){
+        return this.isTentative() || this.isNotAttending();
+    }
 
     public GuestValidResponse isValid(Function<Guest, GuestValidResponse> fn) {
         if (this.phoneNumber() == null) {
