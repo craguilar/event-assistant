@@ -16,10 +16,16 @@ public class NotificationTemplateComponent {
         public String type; // image,text
         public String text;
         public Image image;
+        public Video video;
     }
 
     @ToString
     public static class Image {
+        public String link;
+    }
+
+    @ToString
+    public static class Video {
         public String link;
     }
 }
