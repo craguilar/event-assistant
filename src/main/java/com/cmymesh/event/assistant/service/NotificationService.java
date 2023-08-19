@@ -77,7 +77,7 @@ public class NotificationService {
     private MessageResponse send(Guest guest, NotificationTemplate template) throws InterruptedException {
         GuestValidResponse guestValidation = guest.isValid(GuestValidations.VALIDATE_PHONE);
         if (!guestValidation.isValid()) {
-            LOG.error("Failed to send message to {} {} - {}", guest.phoneNumber(), guest.getFullName(),guestValidation.message());
+            LOG.error("Failed to send message to {} {} - {}", guest.phoneNumber(), guest.getFullName(), guestValidation.message());
             return new MessageResponse(template.templateName(), guestValidation.message(), "failed", "whatsapp", null);
         }
 

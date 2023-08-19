@@ -17,7 +17,7 @@ public record Guest(String id,
                     int seats) {
 
     public boolean shouldSkipNotifictaion(){
-        return this.isTentative() || this.isNotAttending();
+        return this.isTentative() ;
     }
 
     public GuestValidResponse isValid(Function<Guest, GuestValidResponse> fn) {
