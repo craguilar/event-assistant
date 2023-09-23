@@ -17,6 +17,7 @@ public class NotificationTemplateComponent {
         public String text;
         public Image image;
         public Video video;
+        public Document document;
     }
 
     @ToString
@@ -27,6 +28,12 @@ public class NotificationTemplateComponent {
     @ToString
     public static class Video {
         public String link;
+    }
+
+    @ToString
+    public static class Document {
+        public String link;
+        public String filename;
     }
 }
 
