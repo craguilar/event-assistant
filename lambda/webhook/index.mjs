@@ -112,7 +112,7 @@ export const handler = async (event) => {
             Item: {
               'id': {S: phoneNumberId},
               'type': {S: `RECIPIENT-${from}-${timestamp}`},
-              'time' : {N: Date.now()},
+              'time': {N: Date.now()},
               'document': {S: msgBody},
             },
           };
@@ -129,7 +129,7 @@ export const handler = async (event) => {
         Item: {
           'id': {S: phoneNumberId},
           'type': {S: `RECIPIENT-ERROR-${value.statuses[0].recipient_id}-${value.statuses[0].timestamp}`},
-          'time' : {N: Date.now()},
+          'time': {N: Date.now()},
           'document': {S: JSON.stringify(value.statuses[0], null, 2)},
         },
       };
