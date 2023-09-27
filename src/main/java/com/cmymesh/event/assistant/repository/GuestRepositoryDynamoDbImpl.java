@@ -1,7 +1,6 @@
 package com.cmymesh.event.assistant.repository;
 
 import com.cmymesh.event.assistant.model.Guest;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.Condition;
@@ -12,21 +11,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class GuestRepositoryDynamoDbImpl implements GuestRepository {
 
     private final DynamoDbClient ddb;
 
-    public GuestRepositoryDynamoDbImpl() {
-        /*
-          I opt for the client to derive the correct region from either AWS_REGION environment variable or the
-          default profile in the aws config file . This might not be great and could have performance penalties, but
-          it really simplifies this class and configuration injection.
-         */
-        ddb = DynamoDbClient.builder()
-                .credentialsProvider(ProfileCredentialsProvider.create())
-                .build();
+    public GuestRepositoryDynamoDbImpl(DynamoDbClient ddb) {
+        this.ddb = ddb;
     }
 
     @Override
@@ -56,8 +47,9 @@ public class GuestRepositoryDynamoDbImpl implements GuestRepository {
                     item.get("state").s(),
                     item.get("phone").s(),
                     item.get("isTentative").bool(),
-                    item.get("isNotAttending") != null? item.get("isNotAttending").bool() : false,
+                    item.get("isNotAttending") != null ? item.get("isNotAttending").bool() : false,
                     Integer.parseInt(item.get("numberOfSeats").n()));
+
             guests.add(guest);
         }
         return guests;

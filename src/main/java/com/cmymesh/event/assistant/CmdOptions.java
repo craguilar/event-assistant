@@ -18,6 +18,7 @@ public class CmdOptions {
     public static final String EVENT_ID_OPTION = "eventId";
     public static final String STORAGE_MODE_OPTION = "storageMode";
     public static final String APP_RUNNING_MODE_OPTION = "runningMode";
+    public static final String SENDER_PHONE_ID_OPTION = "senderPhoneId";
 
     private CmdOptions() {
         // Utility class adding private constructor
@@ -38,6 +39,8 @@ public class CmdOptions {
                 .collect(Collectors.joining(","));
         Option appRunningMode = new Option("r", APP_RUNNING_MODE_OPTION, true, "App Running modes %s".formatted(runningModes));
         options.addOption(appRunningMode);
+        Option senderPhoneId = new Option("p",SENDER_PHONE_ID_OPTION, true ,"Sender Phone Id ");
+        options.addOption(senderPhoneId);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
