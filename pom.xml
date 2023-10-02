@@ -14,7 +14,6 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <aws.java.sdk.version>2.20.34</aws.java.sdk.version>
   </properties>
 
   <dependencyManagement>
@@ -22,7 +21,7 @@
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>bom</artifactId>
-        <version>${aws.java.sdk.version}</version>
+        <version>2.20.68</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -40,7 +39,7 @@
     <dependency>
       <groupId>com.sleepycat</groupId>
       <artifactId>je</artifactId>
-      <version>4.0.103</version>
+      <version>18.3.12</version>
     </dependency>
 
     <!-- Utils -->
@@ -53,19 +52,19 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.4.2</version>
+      <version>2.15.1</version>
     </dependency>
 
     <dependency>
       <groupId>com.googlecode.libphonenumber</groupId>
       <artifactId>libphonenumber</artifactId>
-      <version>8.12.10</version>
+      <version>8.13.12</version>
     </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.24</version>
+      <version>1.18.26</version>
       <scope>provided</scope>
     </dependency>
 
@@ -81,19 +80,18 @@
       <version>1.5.0</version>
     </dependency>
 
-
     <!-- Logging -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.4.6</version>
+      <version>1.4.7</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
-      <version>1.4.6</version>
+      <version>1.4.7</version>
     </dependency>
 
     <dependency>

@@ -6,6 +6,7 @@ import com.cmymesh.event.assistant.model.MessageResponse;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.je.LockMode;
 import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.IndexNotAvailableException;
@@ -84,6 +85,35 @@ public class EventAssistantRepository implements Closeable {
         }
     }
 
+    public void removeNotification(String guestId, String templateName) {
+        var tx = env.beginTransaction(null, null);
+        try {
+            var guest = dao.personById.get(tx, guestId, LockMode.DEFAULT);
+            var notifications = guest.getNotificationsSent();
+            int i;
+            for (i = 0; i < notifications.size(); i++) {
+                if (notifications.get(i).getTemplateName().equalsIgnoreCase(templateName)) {
+                    break;
+                }
+            }
+            // If we didn't find a match then return
+            if (i >= notifications.size()) {
+                return;
+            }
+            notifications.remove(i);
+            guest = new GuestTracking(guest.getGuestId(), guest.getName(), guest.getTimeCreated(), notifications);
+            dao.personById.put(tx,guest);
+            tx.commit();
+        } catch (Exception e) {
+            log.error("Exception got when updating {} aborting transaction", guestId, e);
+            if (tx != null) {
+                tx.abort();
+            }
+            throw e;
+        }
+
+    }
+
     public List<GuestTracking> listAll() {
         List<GuestTracking> all = new ArrayList<>();
         for (var entry : dao.personById.map().entrySet()) {
@@ -150,8 +180,6 @@ public class EventAssistantRepository implements Closeable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     static class GuestTrackingAccessor {

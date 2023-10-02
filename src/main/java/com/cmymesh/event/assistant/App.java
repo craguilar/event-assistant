@@ -51,7 +51,6 @@ public class App {
             var ddb = DynamoDbClient.builder().credentialsProvider(ProfileCredentialsProvider.create()).build();
             var guestFactory = new GuestRepositoryFactory(ddb);
             var guestService = guestFactory.guestService(guestStorageMode);
-
             // Execute
             switch (runningMode) {
                 case GUEST_VALIDATE -> GuestValidations.validate(guestService.listGuests(eventId));
