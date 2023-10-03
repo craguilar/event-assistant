@@ -53,13 +53,14 @@ public class MessageReplyReader {
         }
         for (MessageReply reply : messagesRepository.getReplies(repliesToPhoneId)) {
             // localize number
-            var phone = reply.phoneNumber().substring(3);
+            var phone = reply.phoneNumber().substring(Math.max(reply.phoneNumber().length() - 10, 0));
+
             var messages = replies.getOrDefault(Long.parseLong(phone), new ArrayList<>());
             messages.add(reply);
             replies.put(Long.parseLong(phone), messages);
         }
         for (Map.Entry<Long, List<MessageReply>> entry : replies.entrySet()) {
-            var fullName = guests.get(entry.getKey());
+            var fullName = guests.getOrDefault(entry.getKey(), entry.getKey().toString());
             System.out.println(fullName + " replied: ");
             entry.getValue().forEach(m -> System.out.println("\t " + m.time() + " [" + m.reply() + "]"));
         }
