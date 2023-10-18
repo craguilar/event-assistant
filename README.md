@@ -63,6 +63,7 @@ It is used to store Guest Tracking info in EventAssistantRepository.
 # TODO
 1. Add support for language preferences.
 2. Backup DB
+3. Integrate with https://jreleaser.org/
 
 # References
 - Thanks to https://developers.facebook.com/blog/post/2022/11/07/adding-whatsapp-to-your-java-projects/
