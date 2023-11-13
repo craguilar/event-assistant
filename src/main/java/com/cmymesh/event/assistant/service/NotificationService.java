@@ -39,6 +39,9 @@ public class NotificationService {
         LOG.info("[{}] Preparing notifications to {} guests ", template.templateName(), guests.size());
         for (Guest guest : guests) {
             var guestTracking = eventAssistantService.get(guest.id());
+            if(guestTracking == null){
+                guestTracking = eventAssistantService.getByName(guest.getFullName());
+            }
             var notificationAlreadySent = guestTracking != null && guestTracking.containsSuccessNotification(template.templateName());
             var notificationRetriesExhausted = guestTracking != null && guestTracking.containsNonRetryableErrorNotification(template.templateName());
             if (guest.shouldSkipNotifictaion() || notificationAlreadySent || notificationRetriesExhausted) {
@@ -72,7 +75,6 @@ public class NotificationService {
         }
         LOG.info("Notifications sent {} , skipped {}, error {}", notificationsSent, notificationsSkipped, error);
     }
-
 
     private MessageResponse send(Guest guest, NotificationTemplate template) throws InterruptedException {
         GuestValidResponse guestValidation = guest.isValid(GuestValidations.VALIDATE_PHONE);

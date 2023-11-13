@@ -11,6 +11,7 @@ import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.IndexNotAvailableException;
 import com.sleepycat.persist.PrimaryIndex;
+import com.sleepycat.persist.SecondaryIndex;
 import com.sleepycat.persist.StoreConfig;
 import com.sleepycat.persist.evolve.Conversion;
 import com.sleepycat.persist.evolve.Converter;
@@ -102,7 +103,7 @@ public class EventAssistantRepository implements Closeable {
             }
             notifications.remove(i);
             guest = new GuestTracking(guest.getGuestId(), guest.getName(), guest.getTimeCreated(), notifications);
-            dao.personById.put(tx,guest);
+            dao.personById.put(tx, guest);
             tx.commit();
         } catch (Exception e) {
             log.error("Exception got when updating {} aborting transaction", guestId, e);
@@ -124,6 +125,10 @@ public class EventAssistantRepository implements Closeable {
 
     public GuestTracking get(String guestId) {
         return dao.personById.get(guestId);
+    }
+
+    public GuestTracking getByName(String name) {
+        return dao.personByName.get(name);
     }
 
     public boolean delete(String guestId) {
@@ -186,13 +191,14 @@ public class EventAssistantRepository implements Closeable {
 
         /* Person accessors */
         final PrimaryIndex<String, GuestTracking> personById;
-
+        final SecondaryIndex<String, String, GuestTracking> personByName;
 
         /* Opens all primary and secondary indices. */
         public GuestTrackingAccessor(EntityStore store)
                 throws DatabaseException {
 
             personById = store.getPrimaryIndex(String.class, GuestTracking.class);
+            personByName = store.getSecondaryIndex(personById, String.class, "name");
 
         }
     }
